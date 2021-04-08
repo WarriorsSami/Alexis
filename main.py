@@ -27,6 +27,8 @@ from DBHandler import DBHandler
 from win10toast import ToastNotifier
 from util import getAppConfig
 from app import App
+from neural_network import NeuralNetworkLoader
+from chatbot import ConversationMode
 
 
 # Class Template defining personal and customizable voice assistant bot
@@ -79,6 +81,9 @@ class TalkingBot(object):
         self.logs.write('\n\n')
         str_time = datetime.datetime.now().strftime("%H:%M:%S")
         self.logs.write(str_time + '\n')
+
+        self.brain = NeuralNetworkLoader()
+        self.conversation_engine = ConversationMode()
 
         try:
             self.db_manager = DBHandler()
@@ -1079,6 +1084,29 @@ class TalkingBot(object):
         time.sleep(0.3)
         self.bot_speak('Pbinfo bot has been launched successfully!')
 
+    # neural network based conversation engine
+    def start_conversation(self):
+        self.bot_speak('I\'m gonna enter into the smart conversation mode in a few seconds ... Please wait ...')
+        self.brain.updateNeuralNetwork()
+        time.sleep(0.3)
+
+        self.bot_speak('You can talk to me now!')
+        while True:
+            while True:
+                message = self.record_audio()
+                if self.speech_unrecognizable is False:
+                    break
+
+            if 'exit' in message:
+                break
+
+            intent = self.conversation_engine.predict_class(message)
+            response = self.conversation_engine.get_response(intent)
+            self.bot_speak(response)
+
+        time.sleep(0.3)
+        self.bot_speak('Thanks for your collaboration ... I have learned a lot from this conversation with you!')
+
     # conversation main method
     def respond(self, voice_data_local):
         if 'who are you' in voice_data_local:
@@ -1194,6 +1222,9 @@ class TalkingBot(object):
 
         elif 'voice' in voice_data_local:
             self.change_voice()
+
+        elif 'conversation' in voice_data_local:
+            self.start_conversation()
 
         else:
             self.say_default()

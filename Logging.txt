@@ -743,3 +743,14 @@ Sami: invoke
 
 
 12:04:47
+
+
+17:14:21
+
+Alexis: How can I help you, Sami?
+Sami: enter conversation mode
+Alexis: I'm gonna enter into the smart conversation mode in a few seconds ... Please wait ...
+Alexis: You can talk to me now!
+Sami: hello
+
+17:16:03
