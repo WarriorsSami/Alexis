@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<head>    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://rawcdn.githack.com/python-visualization/folium/master/folium/templates/leaflet.awesome.rotate.css"/>
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_e20606fedbc14cf38a77d52210b68938 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+            </style>
+        
+</head>
+<body>    
+    
+            <div class="folium-map" id="map_e20606fedbc14cf38a77d52210b68938" ></div>
+        
+</body>
+<script>    
+    
+            var map_e20606fedbc14cf38a77d52210b68938 = L.map(
+                "map_e20606fedbc14cf38a77d52210b68938",
+                {
+                    center: [44.5292, 26.0],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 13,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_1f9c876b1c6a48879d1f324ed1f24281 = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_e20606fedbc14cf38a77d52210b68938);
+        
+    
+            var marker_d4f37dea4a874daa96b6c2f8bf778678 = L.marker(
+                [44.5292, 26.0],
+                {}
+            ).addTo(map_e20606fedbc14cf38a77d52210b68938);
+        
+    
+        var popup_296f58db41ff4fea8f8a8fbeaf10c933 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_1003be5cc5554923b371453336a8203e = $(`<div id="html_1003be5cc5554923b371453336a8203e" style="width: 100.0%; height: 100.0%;">Here is your desired location</div>`)[0];
+            popup_296f58db41ff4fea8f8a8fbeaf10c933.setContent(html_1003be5cc5554923b371453336a8203e);
+        
+
+        marker_d4f37dea4a874daa96b6c2f8bf778678.bindPopup(popup_296f58db41ff4fea8f8a8fbeaf10c933)
+        ;
+
+        
+    
+    
+                function newMarker(e){
+                    var new_mark = L.marker().setLatLng(e.latlng).addTo(map_e20606fedbc14cf38a77d52210b68938);
+                    new_mark.dragging.enable();
+                    new_mark.on('dblclick', function(e){ map_e20606fedbc14cf38a77d52210b68938.removeLayer(e.target)})
+                    var lat = e.latlng.lat.toFixed(4),
+                       lng = e.latlng.lng.toFixed(4);
+                    new_mark.bindPopup("Waypoint");
+                    };
+                map_e20606fedbc14cf38a77d52210b68938.on('click', newMarker);
+            
+</script>

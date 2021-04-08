@@ -1,0 +1,745 @@
+
+
+14:44:29
+
+
+14:47:15
+
+
+14:51:14
+
+
+15:08:46
+
+Alexis: How can I help you master?
+Sami: exit
+
+15:16:59
+
+Alexis: How can I help you Sami?
+Sami: activate yourself
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: hibernate
+Alexis: How many seconds do you want me to hibernate?
+Alexis: Sorry, I did not get that
+Alexis: Sorry, I did not get that
+Sami: 10
+Alexis: I will deactivate myself for 10 seconds. Please wait in silence...
+Alexis: Good afternoon Sami! I am back and ready to answer your call!
+Sami: exit
+Alexis: See you later!
+
+13:19:05
+
+
+13:21:07
+
+
+13:54:40
+
+Alexis: How can I help you, Sami?
+Sami: twerk IP initialised IP tracker
+Alexis: Please provide a suitable IP address to be tracked
+Alexis: IP tracker engine is being initialized... Please wait...
+
+13:58:15
+
+Alexis: How can I help you, Sami?
+Sami: neutralise ip-tracker
+Alexis: Please provide a suitable IP address to be tracked
+
+13:59:29
+
+Alexis: How can I help you, Sami?
+Sami: IP tracker
+Alexis: Please provide a suitable IP address to be tracked
+Alexis: IP tracker engine is being initialized... Please wait...
+
+14:10:25
+
+Alexis: How can I help you, Sami?
+Sami: can you show lies by B tracker
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: IP tracker
+Alexis: IP tracker engine is being initialized... Please wait...
+
+14:29:54
+
+
+14:39:57
+
+Alexis: How can I help you, Sami?
+Sami: buy ice
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: can you show Eliza IP
+Alexis: Please provide a suitable IP address to be tracked
+Alexis: IP tracker engine is being initialized... Please wait...
+Alexis: Here is your desired location: 
+Sami: exit
+Alexis: See you later!
+
+14:41:46
+
+Alexis: How can I help you, Sami?
+Sami: initialise ip-tracker
+Alexis: Please provide a suitable IP address to be tracked
+Alexis: IP tracker engine is being initialized... Please wait...
+
+14:42:54
+
+Alexis: How can I help you, Sami?
+Sami: tracker
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: initialise IP
+Alexis: Please provide a suitable IP address to be tracked
+Alexis: IP tracker engine is being initialized... Please wait...
+Alexis: Here is your desired location: 
+Sami: exit
+Alexis: See you later!
+
+14:46:59
+
+Alexis: How can I help you, Sami?
+Sami: 4ib
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: tracker
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: specialise I've been tracker
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: IP
+Alexis: Please provide a suitable IP address to be tracked
+Alexis: IP tracker engine is being initialized... Please wait...
+
+14:48:46
+
+
+14:53:32
+
+Alexis: How can I help you, Sami?
+Sami: IP
+Alexis: Please provide a suitable IP address to be tracked
+Alexis: IP tracker engine is being initialized... Please wait...
+Alexis: Here is your desired location: 
+
+14:57:07
+
+
+15:02:00
+
+Alexis: How can I help you, Sami?
+Sami: IP tracker
+Alexis: Please provide a suitable IP address to be tracked
+Alexis: IP tracker engine is being initialized... Please wait...
+Alexis: Here is your desired location: 
+Alexis: Sorry, I did not get that
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: exit
+Alexis: See you later!
+
+15:04:35
+
+Alexis: How can I help you, Sami?
+Sami: DPD tracking
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: baby
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: beach worker
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: IP engine
+Alexis: Please provide a suitable IP address to be tracked
+Alexis: IP tracker engine is being initialized... Please wait...
+Alexis: Here is your desired location: 
+Alexis: Sorry, I did not get that
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: exit
+Alexis: See you later!
+
+15:07:58
+
+Alexis: How can I help you, Sami?
+Sami: IP tracker
+Alexis: Please provide a suitable IP address to be tracked
+Alexis: IP tracker engine is being initialized... Please wait...
+Alexis: Here is your desired location: 
+Alexis: Sorry, I did not get that
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: Alexis
+Alexis: Did you call me master?
+Sami: what time is it
+Alexis: The current time is Sat Dec 26 15:09:29 2020
+Sami: tell me a joke
+Alexis: What's the object-oriented way to become wealthy? Inheritance.
+Alexis: Sorry, I did not get that
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: how do you feel
+Alexis: I'm pretty fine Sami. You know ... life is gonna be more interesting when you have a boredom killer like me beside you. Hahaha!
+Sami: change voice
+Alexis: My voice is gonna be switched...
+Alexis: Choose your favourite feminine voice ID: 0, 1 or 2
+Sami: hi Alexis
+Sami: Alexis
+Sami: Alexis
+Sami: 0
+Sami: Alexa
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: who are you
+Alexis: My name is Alexis and I am your personal voice assistant
+Sami: IP location
+Alexis: Please provide a suitable IP address to be tracked
+Alexis: IP tracker engine is being initialized... Please wait...
+Alexis: Here is your desired location: 
+Alexis: Sorry, I did not get that
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: Alexis
+Alexis: Did you call me master?
+Sami: exit
+Alexis: See you later!
+
+08:36:34
+
+
+08:42:00
+
+Alexis: How can I help you, Sami?
+Sami: SQL query
+Alexis: What kind of SQL query do you wanna perform?
+Sami: I want a funny dessert
+Alexis: Unfortunately, there is no such command. Try something else!
+Alexis: What kind of SQL query do you wanna perform?
+Sami: insert
+Alexis: What do you want to insert into the data base?
+Sami: over there
+Alexis: Unfortunately, there is no such command. Try something else!
+Alexis: What do you want to insert into the data base?
+Alexis: Sorry, I did not get that
+Sami: order
+Alexis: Your choice is to insert orders. How many orders do you wanna insert?
+Sami: 100
+Alexis: Your choice is to insert 100 orders
+Alexis: 100 orders inserted successfully!
+Alexis: What do you want to insert into the data base?
+Sami: visa 2 minutes that 0
+Alexis: Unfortunately, there is no such command. Try something else!
+Alexis: What do you want to insert into the data base?
+Sami: weather
+Alexis: Unfortunately, there is no such command. Try something else!
+Alexis: What do you want to insert into the data base?
+Sami: Lindsay Lohan
+Alexis: Unfortunately, there is no such command. Try something else!
+Alexis: What do you want to insert into the data base?
+Sami: order
+Alexis: Your choice is to insert orders. How many orders do you wanna insert?
+Sami: 1000
+Alexis: Your choice is to insert 1000 orders
+Alexis: Something went wrong and handler collapsed... Bye bye!
+
+08:45:53
+
+
+08:50:00
+
+
+08:54:52
+
+
+08:56:56
+
+
+18:06:33
+
+
+18:14:33
+
+
+12:11:11
+
+
+12:15:58
+
+
+12:20:56
+
+
+12:22:50
+
+
+12:28:31
+
+
+12:30:20
+
+
+12:30:45
+
+
+12:31:28
+
+
+12:35:08
+
+
+12:38:36
+
+
+12:39:10
+
+
+12:42:25
+
+
+12:43:33
+
+
+12:49:15
+
+
+12:55:29
+
+
+12:56:31
+
+
+12:58:07
+
+
+12:58:31
+
+
+13:01:20
+
+
+13:03:19
+
+
+13:04:08
+
+
+13:06:19
+
+
+13:07:58
+
+
+13:46:06
+
+
+13:59:45
+
+
+14:00:22
+
+
+14:25:32
+
+
+14:31:45
+
+
+14:39:04
+
+
+14:49:08
+
+
+14:59:12
+
+
+15:03:51
+
+
+15:06:25
+
+
+15:08:30
+
+
+16:22:38
+
+
+16:23:41
+
+
+16:28:50
+
+
+16:30:54
+
+Alexis: How can I help you, Sami?
+Alexis: Sorry, I did not get that
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: in group book
+Alexis: Unfortunately, there is no such command. Try something else!
+Alexis: Sorry, I did not get that
+Alexis: Unfortunately, there is no such command. Try something else!
+Alexis: Sorry, I did not get that
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: evoke vehicle
+Alexis: Unfortunately, there is no such command. Try something else!
+Alexis: Sorry, I did not get that
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: invoke
+
+16:37:02
+
+
+16:51:18
+
+
+16:52:22
+
+
+16:53:50
+
+
+16:55:16
+
+
+16:30:16
+
+
+16:30:39
+
+
+16:32:51
+
+
+16:33:30
+
+
+16:35:17
+
+
+16:36:25
+
+
+16:58:12
+
+
+17:00:39
+
+
+17:02:16
+
+
+17:14:33
+
+
+17:14:52
+
+
+17:15:42
+
+
+17:16:50
+
+
+21:32:37
+
+
+21:34:28
+
+
+21:35:21
+
+
+21:31:22
+
+
+21:52:01
+
+
+22:03:06
+
+
+22:05:07
+
+
+22:06:01
+
+
+22:06:28
+
+
+22:07:19
+
+
+22:09:33
+
+
+22:10:09
+
+
+22:10:56
+
+
+23:00:09
+
+
+23:01:22
+
+
+23:02:27
+
+
+23:20:16
+
+
+23:27:31
+
+
+23:28:24
+
+
+14:20:02
+
+
+14:20:25
+
+
+14:35:36
+
+
+14:39:58
+
+
+14:40:34
+
+
+14:41:21
+
+
+14:45:20
+
+
+14:56:51
+
+
+14:57:22
+
+
+15:02:38
+
+
+15:08:43
+
+
+15:15:18
+
+
+15:15:49
+
+
+15:17:22
+
+
+15:23:50
+
+
+15:27:40
+
+
+15:28:26
+
+
+15:31:34
+
+
+15:32:50
+
+
+15:35:07
+
+
+15:45:15
+
+
+15:46:37
+
+
+15:49:01
+
+
+15:57:16
+
+
+16:07:40
+
+
+16:14:51
+
+
+16:18:33
+
+
+16:20:00
+
+
+16:20:56
+
+
+16:21:39
+
+
+16:23:15
+
+
+16:25:45
+
+
+16:26:17
+
+
+16:27:12
+
+
+16:33:20
+
+
+16:34:19
+
+
+16:37:56
+
+
+16:41:56
+
+
+16:44:06
+
+
+16:45:14
+
+
+16:49:52
+
+
+17:01:13
+
+
+17:02:44
+
+
+17:03:49
+
+
+17:05:43
+
+
+18:38:46
+
+
+18:40:03
+
+
+18:44:44
+
+
+18:50:25
+
+
+18:51:31
+
+
+19:02:45
+
+
+19:05:17
+
+
+19:26:17
+
+
+19:31:46
+
+
+19:32:19
+
+
+19:32:42
+
+
+20:06:48
+
+
+20:36:52
+
+
+20:37:21
+
+
+20:42:30
+
+
+21:08:39
+
+
+21:55:54
+
+
+21:58:22
+
+
+22:05:43
+
+
+22:27:14
+
+
+22:36:35
+
+
+22:37:18
+
+
+22:38:58
+
+
+22:57:41
+
+
+23:02:48
+
+
+23:32:04
+
+
+23:45:24
+
+
+23:46:25
+
+
+12:20:01
+
+
+13:22:35
+
+
+13:59:13
+
+
+21:20:00
+
+
+13:56:44
+
+
+10:54:44
+
+
+10:56:28
+
+
+11:16:36
+
+
+11:17:12
+
+
+11:22:07
+
+
+12:04:34
+
+
+12:04:47
