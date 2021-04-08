@@ -123,7 +123,6 @@ class TalkingBot(object):
         # Initialize the engine
         self.engine.setProperty('voice', self.voices['David'])
         self.engine.say(command)
-        print('\n' + command)
         if self.record is True:
             self.logs.write('\nAlexis: ' + command)
         self.engine.runAndWait()
@@ -133,7 +132,6 @@ class TalkingBot(object):
         # Initialize the engine
         self.engine.setProperty('voice', self.voices['Hazel'])
         self.engine.say(command)
-        print('\n' + command)
         if self.record is True:
             self.logs.write('\nAlexis: ' + command)
         self.engine.runAndWait()
@@ -143,7 +141,6 @@ class TalkingBot(object):
         # Initialize the engine
         self.engine.setProperty('voice', self.voices['Zira'])
         self.engine.say(command)
-        print('\n' + command)
         if self.record is True:
             self.logs.write('\nAlexis: ' + command)
         self.engine.runAndWait()
@@ -155,7 +152,6 @@ class TalkingBot(object):
         audio_file = 'audio-' + str(rand) + '.mp3'
         tts.save(audio_file)
         playsound.playsound(audio_file)
-        print('\n' + command)
         if self.record is True:
             self.logs.write('\nAlexis: ' + command)
         os.remove(audio_file)
@@ -177,6 +173,7 @@ class TalkingBot(object):
 
     # bot voice
     def bot_speak(self, command):
+        print('\nAlexis: ' + command)
         if self.sex == 'm':
             self.bot_speak_m(command)
         else:
@@ -204,6 +201,7 @@ class TalkingBot(object):
             except sr.RequestError:
                 self.bot_speak('Sorry, my speech service is not working. I will stop my execution thread')
                 exit()
+            print('\nMe: ' + voice_data_local)
             return voice_data_local.lower()
 
     # self presentation
