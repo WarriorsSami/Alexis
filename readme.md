@@ -1,21 +1,14 @@
-1. Install all the dependencies from the requirements.txt file.
-2. Make sure to install a webdriver, based on your current version of your browser.
-More details: https://www.youtube.com/watch?v=7R5n0sNSza8&ab_channel=StudentEnginee and
-https://selenium-python.readthedocs.io/installation.html
-3. Put the driver in  the drivers folder. 
-4. Name the driver executable file according to the following logic:
+##Alexis - Pythonic Voice Assistant
 
-if YourBrowserName == "chrome": \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name the executable file "chrome"   
-elif YourBrowserName == "edge": \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name the executable file "edge" \
-elif YourBrowserName == "firefox": \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name the executable file "firefox" \
-elif YourBrowserName == "safari": \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name the executable file "safari" \
-elif YourBrowserName == "opera": \
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name the executable file "chrome" \
-else: \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sorry we don't support your browser at the moment
+###1. Acest folder cuprinde o aplicație python ce reprezintă un asistent vocal bazat pe ***weak AI și speech recognition***, capabil să desfășoare circa 50 de comenzi diferite, similar cu Bixby (Samsung), Siri (Apple), Cortana (Windows) sau Alexa (Amazon).
+###2. Principalele sale abilități includ:
+###- conversație inteligentă, realizată cu ajutorul Machine Learning și a unei rețele neuronale;
+###- traducere într-o serie de circa 10 limbi străine;
+###- control de bază al sistemului de operare (shut down, hibernate, change background);
+###- accesare de browsere și APIs pentru vreme, știri, trivia, etc.;
+###- control al bazei de date alocate proiectului PHP;
+###- conectare la conturi de utilizatori pbinfo, descărcare/încărcare de cod sursă și trimitere de mesaje via Selenium și MongoDB;
 
-5. Change BROWSER_NAME according to your needs
+###Pentru rulare este necesară instalarea Python SDK-ului pentru versiunea minim 3.8 a limbajului (https://www.python.org/downloads/) și a tuturor package-urilor specificate în fișierul **requirements.txt**.
+####De asemenea, unele package-uri necesită instalarea manuală via pip install cmd.
+####O altă alternativă (mai ușoară din punctul meu de vedere) este utilizarea platformei github și a git tools pentru a automatiza tot procesul de configurare.
