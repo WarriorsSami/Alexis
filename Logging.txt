@@ -757,3 +757,71 @@ Sami: hello
 
 
 20:33:20
+
+
+13:39:43
+
+
+12:22:57
+
+Alexis: How can I help you, Sami?
+Sami: turn on the camera
+Alexis: Photo has been taken
+Sami: take another photo
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: turn on camera
+Alexis: Photo has been taken
+Sami: exit
+Alexis: See you later!
+
+13:01:03
+
+
+13:01:22
+
+
+13:03:06
+
+
+13:16:09
+
+
+13:35:32
+
+
+13:41:24
+
+
+14:18:48
+
+
+14:19:56
+
+Alexis: How can I help you, Sami?
+Sami: play music
+Alexis: What song do you wanna listen?
+Sami: shaggy Mr Boombastic
+
+14:27:24
+
+Alexis: How can I help you, Sami?
+Sami: play a song
+Alexis: What song do you wanna listen?
+Sami: lifestyle Jason Derulo
+
+14:29:16
+
+
+14:40:57
+
+
+14:46:26
+
+
+14:49:17
+
+
+14:52:24
+
+
+14:58:52

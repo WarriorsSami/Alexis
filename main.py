@@ -1,3 +1,4 @@
+import selenium.common.exceptions
 import speech_recognition as sr
 import webbrowser
 import pyttsx3
@@ -11,13 +12,16 @@ import datetime
 import random
 from gtts import gTTS
 from selenium import webdriver
-import selenium
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from translate import Translator
 import json
 import wolframalpha
 import ctypes
 import pyjokes
-# from ecapture import ecapture as ec
+from ecapture import ecapture as ec
 import smtplib
 import pygeoip
 import folium
@@ -446,21 +450,64 @@ class TalkingBot(object):
             if self.speech_unrecognizable is False:
                 break
 
+        driver = webdriver.Edge(executable_path=r'./drivers/edge.exe')
+        driver.maximize_window()
+
+        """
         try:
-            driver = webdriver.Edge(executable_path=r'C:\\Users\\barbu\\PycharmProjects\\AlexisAPI_final\\drivers'
-                                                    '\\edge.exe')
-            driver.maximize_window()
             driver.get(url='https://www.youtube.com/results?search_query=' + search_for)
-            video = driver.find_element_by_xpath('//*[@id="dismissable"]')
-            video.click()
-        except selenium.common.exceptions.ElementClickInterceptedException:
-            self.bot_speak('Sorry, but session has just collapsed and me too...')
-            exit()
         except selenium.common.exceptions.SessionNotCreatedException:
             self.bot_speak('Sorry, but session has just collapsed and me too...')
             exit()
 
+        while True:
+            try:
+                video = driver.find_element_by_xpath('//*[@id="dismissable"]')
+                video.click()
+                break
+            except selenium.common.exceptions.ElementClickInterceptedException:
+                self.bot_speak('Sorry, but session has just collapsed and me too...')
+                exit()
+            except selenium.common.exceptions.NoSuchElementException:
+                skip = driver.find_element_by_xpath('/html/body/div[2]/div[3]/form/input[12]')
+                skip.click()
+        """
+
+        wait = WebDriverWait(driver, 3)
+        presence = EC.presence_of_element_located
+        visible = EC.visibility_of_element_located
+
+        # Navigate to url with video being appended to search_query
+        driver.get('https://www.youtube.com/results?search_query={}'.format(str(search_for)))
+
+        try:
+            skip = driver.find_element_by_xpath('/html/body/div[2]/div[3]/form/input[12]')
+            skip.click()
+        except selenium.common.exceptions.NoSuchCookieException:
+            pass
+
+        # play the video
+        wait.until(visible((By.ID, "video-title")))
+        driver.find_element_by_id("video-title").click()
+
         self.bot_speak('Here is your song: ' + search_for)
+        time.sleep(0.3)
+        while True:
+            while True:
+                command = self.record_audio()
+                if self.speech_unrecognizable is False:
+                    break
+
+            if 'stop' in command or 'resume' in command:
+                try:
+                    video = driver.find_element_by_xpath('//*[@id="movie_player"]/div[1]/video')
+                    video.click()
+                except selenium.common.exceptions.NoSuchElementException:
+                    pass
+            elif 'exit' in command:
+                break
+        driver.close()
+        self.bot_speak('The video has finished. Enter into the main mode for requesting another one!')
 
     # similar to destructor - turn off bot
     def exit(self):
@@ -812,9 +859,9 @@ class TalkingBot(object):
         self.bot_speak('Thanks for taking care of me, sir!')
 
     # take photo
-    # def take_photo(self):
-    #    ec.capture(0, "Alexis Camera", "img.jpg")
-    #    self.bot_speak('Photo has been taken')
+    def take_photo(self):
+        ec.capture(0, "Alexis Camera", "img.jpg")
+        self.bot_speak('Photo has been taken')
 
     # get current wish
     @staticmethod
@@ -973,11 +1020,10 @@ class TalkingBot(object):
         time.sleep(0.5)
         self.bot_speak('Translation session finished')
 
-    # open opera
-    def open_opera(self):
-        code_path = r"C:\\Users\\barbu\\AppData\\Local\\Programs\\Opera\\launcher.exe"
-        os.startfile(code_path)
-        self.bot_speak('Opera has been launched')
+    # open browser
+    def open_browser(self):
+        webbrowser.get().open('https://google.com')
+        self.bot_speak('The browser has been launched')
 
     # write note
     def write_note(self):
@@ -1069,9 +1115,9 @@ class TalkingBot(object):
 
     # pbinfo bot invoke
     def pbinfo_invoke(self):
-        config = getAppConfig("./settings.json")
+        config1 = getAppConfig("./settings.json")
 
-        AppPbinfo = App(config)
+        AppPbinfo = App(config1)
         AppPbinfo.run()
 
         # config1 = getAppConfig("./settings1.json")
@@ -1116,8 +1162,8 @@ class TalkingBot(object):
         elif 'clear' in voice_data_local:
             self.clear_log()
 
-        elif 'open opera' in voice_data_local:
-            self.open_opera()
+        elif 'open browser' in voice_data_local:
+            self.open_browser()
 
         elif 'awesome' in voice_data_local:
             self.wonderful()
@@ -1158,8 +1204,8 @@ class TalkingBot(object):
         elif 'weather' in voice_data_local:
             self.get_weather()
 
-        # elif 'camera' in voice_data_local or 'take photo' in voice_data_local:
-        #    self.take_photo()
+        elif 'camera' in voice_data_local or 'take photo' in voice_data_local:
+            self.take_photo()
 
         elif 'how are you' in voice_data_local:
             self.fine()
@@ -1274,6 +1320,3 @@ class TalkingBot(object):
 if __name__ == '__main__':
     MyBot = TalkingBot('Alexis', 'm')
     MyBot.run()
-    # MyBot.pbinfo_invoke()
-    # MyBot.play_music()
-    # MyBot.track_ip()

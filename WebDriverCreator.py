@@ -1,6 +1,6 @@
 from selenium import webdriver
 
-DRIVER_PATH = r"C:\\Users\\barbu\\PycharmProjects\\AlexisAPI_final\\drivers\\"
+DRIVER_PATH = r"./drivers/"
 
 
 class WebDriverCreator:
