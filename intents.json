@@ -137,6 +137,23 @@
         "You are such a nice guy too!",
         "Thanks my friend!",
         "It's good to know that I am useful!"]
+    },
+
+    {
+      "tag": "origin",
+      "patterns": [
+        "Where are you from?",
+        "Where is your home?",
+        "Do you know what are your origins?",
+        "Where did you appear?",
+        "Where are you leaving?"],
+      "responses": [
+        "I think I'm from Netherlands",
+        "I don't know, but I know that my master is from Romania",
+        "I'm coming from Mars",
+        "My home is in Alpha Centauri",
+        "I live in Bahamas"
+      ]
     }
   ]
 }
