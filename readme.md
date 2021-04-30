@@ -1,4 +1,4 @@
-## Alexis - Pythonic Voice Assistant
+## Alexis - Voice Assistant using Python
 ### https://youtu.be/_V4IC4w4Yio
 
 ### 1. Acest folder cuprinde o aplicație python ce reprezintă un asistent vocal bazat pe ***weak AI și speech recognition***, capabil să desfășoare circa 50 de comenzi diferite, similar cu Bixby (Samsung), Siri (Apple), Cortana (Windows) sau Alexa (Amazon).
