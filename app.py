@@ -18,19 +18,11 @@ class App:
         self.userCollection = self.userDB[self.config["mongoCollection"]]
         self.problemCollection = self.userDB[self.config["mongoCollectionSolve"]]
 
-    def run(self):
+    def run_for_users(self):
         try:
-            self.login(self.config['userDest'], self.driver1)
-
-            # self.login(self.config['userDest'], self.driver2)
-
-            # self.get_submissions(self.config['userSrc'])
-            # self.get_code()
-
-            self.deploy_code()
-
-            if self.config["clearDB"]:
-                self.clearDB()
+            self.login(self.config['userSrc'], self.driver1)
+            self.populateDBFromTop100()
+            self.populateDB()
 
             self.close()
         except Exception:
@@ -40,10 +32,43 @@ class App:
                 pass
 
             self.driver1 = WebDriverCreator.create(self.config["browser"])
-            self.run()
+            self.run_for_users()
 
-    def clearDB(self):
+    def run_for_code_download(self):
+        try:
+            self.login(self.config['userSrc'], self.driver1)
+            self.get_submissions(self.config['userSrc'])
+            self.get_code()
+
+            self.close()
+        except Exception:
+            try:
+                self.driver1.close()
+            except Exception:
+                pass
+
+            self.driver1 = WebDriverCreator.create(self.config["browser"])
+            self.run_for_code_download()
+
+    def run_for_code_upload(self):
+        try:
+            self.login(self.config['userDest'], self.driver1)
+            self.deploy_code()
+
+            self.close()
+        except Exception:
+            try:
+                self.driver1.close()
+            except Exception:
+                pass
+
+            self.driver1 = WebDriverCreator.create(self.config["browser"])
+            self.run_for_code_upload()
+
+    def clearDBUsers(self):
         self.userCollection.remove({})
+
+    def clearDBSubmissions(self):
         self.problemCollection.remove({})
 
     def print_lang(self):
@@ -136,7 +161,8 @@ class App:
             for j in range(1, 51):
                 try:
                     elem = {
-                        "problem": self.driver1.find_element_by_xpath('//*[@id="zona-mijloc"]/div/div[5]/table/tbody/tr[' +
+                        "problem": self.driver1.find_element_by_xpath('//*[@id="zona-mijloc"]/div/div['
+                                                                      '5]/table/tbody/tr[' +
                                                                       str(j) + ']/td[4]/a').get_property('href'),
                         "eval": self.driver1.find_element_by_xpath('//*[@id="zona-mijloc"]/div/div[5]/table/tbody/tr[' +
                                                                    str(j) + ']/td[6]/a').get_property('href'),

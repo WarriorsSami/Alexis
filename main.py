@@ -175,7 +175,7 @@ class TalkingBot(object):
                 self.logs.write('\nAlexis: ' + command + ' - in ' + language)
         os.remove(audio_file)
 
-    # bot voice
+    # bot voice (sync)
     def bot_speak(self, command):
         print('\nAlexis: ' + command)
         if self.sex == 'm':
@@ -1115,15 +1115,42 @@ class TalkingBot(object):
 
     # pbinfo bot invoke
     def pbinfo_invoke(self):
-        config1 = getAppConfig("./settings.json")
+        config = getAppConfig("./settings.json")
+        AppPbinfo = App(config)
 
-        AppPbinfo = App(config1)
-        AppPbinfo.run()
+        self.bot_speak('Let me know what action you want to perform on pbinfo...')
+        time.sleep(0.3)
 
-        # config1 = getAppConfig("./settings1.json")
+        while True:
+            while True:
+                message = self.record_audio()
+                if self.speech_unrecognizable is False:
+                    break
 
-        # AppPbinfo1 = App(config1)
-        # AppPbinfo1.run()
+            if 'exit' in message:
+                break
+            elif 'pick user' in message:
+                self.bot_speak(
+                    'I\'m gonna populate my data base with users from pbinfo ... Please wait ...')
+                AppPbinfo.run_for_users()
+            elif 'save code' in message:
+                self.bot_speak('I\'m gonna populate my data base with your submissions ... Please wait ...')
+                AppPbinfo.run_for_code_download()
+            elif 'deploy code' in message:
+                self.bot_speak(
+                    'I\'m gonna upload your submmissions from my data base to pbinfo account ... '
+                    'Please wait ...')
+                AppPbinfo.run_for_code_upload()
+            elif 'delete user' in message:
+                self.bot_speak('I\'m gonna delete all users from data base ...')
+                AppPbinfo.clearDBUsers()
+            elif 'delete submission' in message:
+                self.bot_speak('I\'m gonna delete all submissions from data base ...')
+                AppPbinfo.clearDBSubmissions()
+            else:
+                self.bot_speak('Try another command, please!')
+
+            time.sleep(0.3)
 
         time.sleep(0.3)
         self.bot_speak('Pbinfo bot has been launched successfully!')
@@ -1168,7 +1195,7 @@ class TalkingBot(object):
         elif 'awesome' in voice_data_local:
             self.wonderful()
 
-        elif 'invoke' in voice_data_local:
+        elif 'programming' in voice_data_local:
             self.pbinfo_invoke()
 
         elif 'background' in voice_data_local:
