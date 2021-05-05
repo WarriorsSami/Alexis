@@ -43,7 +43,7 @@ class App:
             self.run()
 
     def clearDB(self):
-        # self.userCollection.remove({})
+        self.userCollection.remove({})
         self.problemCollection.remove({})
 
     def print_lang(self):

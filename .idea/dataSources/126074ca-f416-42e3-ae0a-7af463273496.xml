@@ -2,7 +2,7 @@
 <dataSource name="MongoDB - pythonreactdb@localhost">
   <database-model serializer="dbm" dbms="MONGO" family-id="MONGO" format-version="4.20">
     <root id="1">
-      <ServerVersion>4.4.3</ServerVersion>
+      <ServerVersion>4.4.5</ServerVersion>
     </root>
     <schema id="2" parent="1" name="admin"/>
     <schema id="3" parent="1" name="config"/>
@@ -10,60 +10,7 @@
     <schema id="5" parent="1" name="pythonreactdb">
       <Current>1</Current>
     </schema>
-    <schema id="6" parent="1" name="test"/>
-    <table id="7" parent="5" name="inventory"/>
-    <table id="8" parent="5" name="pbinfo-submissions"/>
-    <table id="9" parent="5" name="pbinfo-users"/>
-    <table id="10" parent="5" name="users"/>
-    <column id="11" parent="7" name="_id">
-      <DataType>ObjectId(0)|12s</DataType>
-    </column>
-    <column id="12" parent="7" name="item">
-      <DataType>String(0)|12s</DataType>
-    </column>
-    <column id="13" parent="8" name="_id">
-      <DataType>ObjectId(0)|12s</DataType>
-    </column>
-    <column id="14" parent="8" name="code">
-      <DataType>String(0)|12s</DataType>
-    </column>
-    <column id="15" parent="8" name="eval">
-      <DataType>String(0)|12s</DataType>
-    </column>
-    <column id="16" parent="8" name="language">
-      <DataType>String(0)|12s</DataType>
-    </column>
-    <column id="17" parent="8" name="problem">
-      <DataType>String(0)|12s</DataType>
-    </column>
-    <column id="18" parent="8" name="status">
-      <DataType>String(0)|12s</DataType>
-    </column>
-    <column id="19" parent="8" name="executed">
-      <Position>1</Position>
-      <DataType>Boolean|12s</DataType>
-    </column>
-    <column id="20" parent="9" name="_id">
-      <DataType>ObjectId(0)|12s</DataType>
-    </column>
-    <column id="21" parent="9" name="name">
-      <DataType>String(0)|12s</DataType>
-    </column>
-    <column id="22" parent="9" name="send-status">
-      <DataType>String(0)|12s</DataType>
-    </column>
-    <column id="23" parent="10" name="_id">
-      <DataType>ObjectId(0)|12s</DataType>
-    </column>
-    <column id="24" parent="10" name="email">
-      <DataType>String(0)|12s</DataType>
-    </column>
-    <column id="25" parent="10" name="name">
-      <DataType>String(0)|12s</DataType>
-    </column>
-    <column id="26" parent="10" name="password">
-      <Position>1</Position>
-      <DataType>String(0)|12s</DataType>
-    </column>
+    <table id="6" parent="5" name="pbinfo-submissions"/>
+    <table id="7" parent="5" name="pbinfo-users"/>
   </database-model>
 </dataSource>
