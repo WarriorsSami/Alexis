@@ -860,3 +860,30 @@ Sami: NES programming mode
 
 
 23:29:06
+
+
+23:44:47
+
+
+23:58:35
+
+
+23:59:21
+
+
+00:30:32
+
+Alexis: How can I help you, Sami?
+Alexis: Sorry, I did not get that
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: end of animals
+Alexis: Unfortunately, there is no such command. Try something else!
+Sami: programming
+Alexis: Let me know what action you want to perform on pbinfo...
+Sami: deploy code
+Alexis: I'm gonna upload your submmissions from my data base to pbinfo account ... Please wait ...
+
+00:33:35
+
+
+00:34:57

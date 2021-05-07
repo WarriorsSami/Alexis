@@ -104,7 +104,8 @@ class App:
 
             try:
                 lang_id = self.get_lang(submission["language"])
-                option = self.driver1.find_element_by_xpath('//*[@id="limbaj_de_programare"]/option[' + str(lang_id) + ']')
+                option = self.driver1.find_element_by_xpath(
+                    '//*[@id="limbaj_de_programare"]/option[' + str(lang_id) + ']')
                 option.click()
             except NoSuchElementException:
                 pass
@@ -166,8 +167,9 @@ class App:
                                                                       str(j) + ']/td[4]/a').get_property('href'),
                         "eval": self.driver1.find_element_by_xpath('//*[@id="zona-mijloc"]/div/div[5]/table/tbody/tr[' +
                                                                    str(j) + ']/td[6]/a').get_property('href'),
-                        "status": self.driver1.find_element_by_xpath('//*[@id="zona-mijloc"]/div/div[5]/table/tbody/tr[' +
-                                                                     str(j) + ']/td[7]').text,
+                        "status": self.driver1.find_element_by_xpath(
+                            '//*[@id="zona-mijloc"]/div/div[5]/table/tbody/tr[' +
+                            str(j) + ']/td[7]').text,
                         "code": "",
                         "language": "",
                         "executed": False
