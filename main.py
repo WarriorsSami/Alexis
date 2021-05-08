@@ -1,38 +1,41 @@
+import ctypes
+import datetime
+import json
+import os
+import random
+import smtplib
+import time
+import urllib
+import webbrowser
+from time import ctime
+from urllib.request import urlopen
+
+import folium
+import mysql.connector
+import playsound
+import pygeoip
+import pyjokes
+import pyttsx3
 import selenium.common.exceptions
 import speech_recognition as sr
-import webbrowser
-import pyttsx3
-import time
-from urllib.request import urlopen
-from time import ctime
-import urllib
-import playsound
-import os
-import datetime
-import random
+import wikipedia
+import wolframalpha
+from ecapture import ecapture as ec
 from gtts import gTTS
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 from translate import Translator
-import json
-import wolframalpha
-import ctypes
-import pyjokes
-from ecapture import ecapture as ec
-import smtplib
-import pygeoip
-import folium
-import wikipedia
-import mysql.connector
-from DBHandler import DBHandler
 from win10toast import ToastNotifier
-from util import getAppConfig
+
+from DBHandler import DBHandler
 from app import App
-from neural_network import NeuralNetworkLoader
 from chatbot import ConversationMode
+from neural_network import NeuralNetworkLoader
+from util import getAppConfig
+from chatbotgit import main
+from audio_engine import AudioEngine
 
 
 # Class Template defining personal and customizable voice assistant bot
@@ -618,6 +621,11 @@ class TalkingBot(object):
             if self.speech_unrecognizable is False:
                 break
 
+        # engine = AudioEngine(self.engine)
+        # voice_data = engine.record_main()
+        # engine.bot_speak(voice_data)
+        # time.sleep(0.3)
+
         self.bot_speak('You said: ' + voice_data)
 
     # main method for SQL queries
@@ -1157,23 +1165,35 @@ class TalkingBot(object):
 
     # neural network based conversation engine
     def start_conversation(self):
-        self.bot_speak('I\'m gonna enter into the smart conversation mode in a few seconds ... Please wait ...')
-        self.brain.updateNeuralNetwork()
-        time.sleep(0.3)
-
-        self.bot_speak('You can talk to me now!')
+        self.bot_speak('What model do you want to use?')
         while True:
-            while True:
-                message = self.record_audio()
-                if self.speech_unrecognizable is False:
-                    break
-
-            if 'exit' in message:
+            option = self.record_audio()
+            if self.speech_unrecognizable is False:
                 break
 
-            intent = self.conversation_engine.predict_class(message)
-            response = self.conversation_engine.get_response(intent)
-            self.bot_speak(response)
+        if 'mine' in option:
+            self.bot_speak('I\'m gonna enter into the smart conversation mode in a few seconds ... Please wait ...')
+            self.brain.updateNeuralNetwork()
+            time.sleep(0.3)
+
+            self.bot_speak('You can talk to me now!')
+            while True:
+                while True:
+                    message = self.record_audio()
+                    if self.speech_unrecognizable is False:
+                        break
+
+                if 'exit' in message:
+                    break
+
+                intent = self.conversation_engine.predict_class(message)
+                response = self.conversation_engine.get_response(intent)
+                self.bot_speak(response)
+        else:
+            self.bot_speak('I\'m gonna use a pretrained model based on reddit comments. Be careful! I cannot control '
+                           'myself in this state ...')
+            time.sleep(0.3)
+            main(AudioEngine(self.engine))
 
         time.sleep(0.3)
         self.bot_speak('Thanks for your collaboration ... I have learned a lot from this conversation with you!')

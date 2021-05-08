@@ -7,10 +7,12 @@ import nltk
 from nltk.stem import WordNetLemmatizer
 
 from tensorflow.keras.models import load_model
+import tensorflow as tf
 
 
 class ConversationMode:
     def __init__(self):
+        tf.compat.v1.enable_eager_execution()
         self.lemmatizer = WordNetLemmatizer()
         self.intents = json.loads(open("intents.json").read())
 
@@ -61,7 +63,6 @@ class ConversationMode:
             intent = self.predict_class(message)
             response = self.get_response(intent)
             print(response)
-
 
 # Debugger = ConversationMode()
 # Debugger.test()

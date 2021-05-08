@@ -887,3 +887,29 @@ Alexis: I'm gonna upload your submmissions from my data base to pbinfo account .
 
 
 00:34:57
+
+
+16:23:04
+
+
+16:23:30
+
+
+16:55:53
+
+Alexis: How can I help you, Sami?
+Sami: enter conversation mode
+Alexis: What model do you want to use?
+Sami: edit
+Alexis: I'm gonna use a pretrained model based on reddit comments. Be careful! I cannot control myself in this state ...
+
+16:59:35
+
+
+17:01:27
+
+
+17:06:20
+
+
+17:18:32
