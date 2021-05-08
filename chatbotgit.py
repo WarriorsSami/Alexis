@@ -26,7 +26,7 @@ def main(engine):
                         help='prime text')
     parser.add_argument('--beam_width', type=int, default=2,
                         help='Width of the beam for beam search, default 2')
-    parser.add_argument('--temperature', type=float, default=1.2,
+    parser.add_argument('--temperature', type=float, default=1.0,
                         help='sampling temperature'
                              '(lower is more conservative, default is 1.0, which is neutral)')
     parser.add_argument('--topn', type=int, default=-1,
