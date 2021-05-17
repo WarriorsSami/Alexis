@@ -9,6 +9,8 @@ import urllib
 import webbrowser
 from time import ctime
 from urllib.request import urlopen
+from docx import Document
+import re
 
 import folium
 import mysql.connector
@@ -506,6 +508,8 @@ class TalkingBot(object):
                     video = driver.find_element_by_xpath('//*[@id="movie_player"]/div[1]/video')
                     video.click()
                 except selenium.common.exceptions.NoSuchElementException:
+                    pass
+                except selenium.common.exceptions.ElementClickInterceptedException:
                     pass
             elif 'exit' in command:
                 break
@@ -1121,6 +1125,37 @@ class TalkingBot(object):
         path = 'file://C:/Users/barbu/PycharmProjects/AlexisAPI_final/IP_map.html'
         webbrowser.open(path)
 
+    # create project as docx
+    def make_essay(self):
+        global wikipage
+        wikipedia.set_lang('ro')
+
+        self.bot_speak('Provide the subject of the essay')
+        title = input('Essay\'s topic: ')
+        self.bot_speak('Now, provide the name of the author')
+        name = input('Author\'s name: ')
+
+        try:
+            wikipage = wikipedia.page(title)
+        except Exception:
+            print('Project\'s name is invalid')
+
+        text = wikipage.content
+        text = re.sub(r'=', '', text)
+        text = re.sub(r'\n', '\n    ', text)
+        split = text.split('Note', 1)
+        text = split[0]
+
+        document = Document()
+        paragraph = document.add_heading(title, 0)
+        paragraph = document.add_paragraph(name)
+        paragraph.alignment = 2
+
+        paragraph = document.add_paragraph("    " + text)
+        document.save(title + '.docx')
+
+        self.bot_speak('Your essay is ready my friend!')
+
     # pbinfo bot invoke
     def pbinfo_invoke(self):
         config = getAppConfig("./settings.json")
@@ -1313,6 +1348,9 @@ class TalkingBot(object):
 
         elif 'voice' in voice_data_local:
             self.change_voice()
+
+        elif 'essay' in voice_data_local:
+            self.make_essay()
 
         elif 'conversation' in voice_data_local:
             self.start_conversation()
