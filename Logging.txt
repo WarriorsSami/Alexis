@@ -916,3 +916,6 @@ Alexis: I'm gonna use a pretrained model based on reddit comments. Be careful! I
 
 
 17:32:52
+
+
+13:03:35
