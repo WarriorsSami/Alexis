@@ -1,4 +1,5 @@
 selenium~=3.141.0
+python-docx~=0.8.11
 pyttsx3~=2.90
 playsound~=1.2.2
 wolframalpha~=4.1.1
@@ -17,3 +18,4 @@ pymongo~=3.11.3
 numpy~=1.19.5
 nltk~=3.6.1
 tensorflow~=2.4.1
+argparse~=1.4.0

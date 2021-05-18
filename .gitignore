@@ -4,3 +4,8 @@ venv/
 .idea/
 models/
 reddit-parse/
+Logging.txt
+PyAudio-0.2.11-cp38-cp38-win_amd64.whl
+classes.pkl
+words.pkl
+chatbotmodel.h5
