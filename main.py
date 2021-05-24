@@ -211,6 +211,8 @@ class TalkingBot(object):
                 self.bot_speak('Sorry, my speech service is not working. I will stop my execution thread')
                 exit()
             print('\nMe: ' + voice_data_local)
+            if 'text' in voice_data_local:
+                voice_data_local = input("Enter text> ")
             return voice_data_local.lower()
 
     # self presentation
