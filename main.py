@@ -207,12 +207,15 @@ class TalkingBot(object):
                 if self.record is True:
                     self.logs.write('\nSami: ' + voice_data_local)
             except sr.UnknownValueError:
-                self.bot_speak('Sorry, I did not get that')
+                if random.randint(1, 1000) % 10 == 0:
+                    self.bot_speak('Sorry, I did not get that')
                 self.speech_unrecognizable = True
             except sr.RequestError:
                 self.bot_speak('Sorry, my speech service is not working. I will stop my execution thread')
                 exit()
             print('\nMe: ' + voice_data_local)
+            if 'text' in voice_data_local or 'write' in voice_data_local:
+                voice_data_local = input("Enter text:> ")
             return voice_data_local.lower()
 
     # self presentation
@@ -1107,25 +1110,28 @@ class TalkingBot(object):
         time.sleep(0.4)
         res = gip.record_by_addr(my_ip)
         self.bot_speak('Here is your desired location: ')
-        for key, val in res.items():
-            print('%s: %s' % (key, val))
-        # self.bot_speak('Latitude: %s \nLongitude: %s' % (res['latitude'], res['longitude']))
+        try:
+            for key, val in res.items():
+                print('%s: %s' % (key, val))
+            # self.bot_speak('Latitude: %s \nLongitude: %s' % (res['latitude'], res['longitude']))
 
-        m = folium.Map(
-            location=[float(res['latitude']), float(res['longitude'])],
-            zoom_start=13
-        )
+            m = folium.Map(
+                location=[float(res['latitude']), float(res['longitude'])],
+                zoom_start=13
+            )
 
-        folium.Marker(
-            [float(res['latitude']), float(res['longitude'])],
-            popup='Here is your desired location'
-        ).add_to(m)
+            folium.Marker(
+                [float(res['latitude']), float(res['longitude'])],
+                popup='Here is your desired location'
+            ).add_to(m)
 
-        m.add_child(folium.ClickForMarker(popup='Waypoint'))
+            m.add_child(folium.ClickForMarker(popup='Waypoint'))
 
-        m.save('IP_map.html')
-        path = 'file://C:/Users/barbu/PycharmProjects/AlexisAPI_final/IP_map.html'
-        webbrowser.open(path)
+            m.save('IP_map.html')
+            path = 'http://localhost:63342/Alexis/IP_map.html'
+            webbrowser.get().open(path)
+        except AttributeError:
+            self.bot_speak('There is no such ip address...')
 
     # create project as docx
     def make_essay(self):

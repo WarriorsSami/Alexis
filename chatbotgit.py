@@ -140,6 +140,8 @@ def chatbot(net, sess, chars, vocab, max_length, beam_width, relevance, temperat
         user_input = engine.record_main()
         if 'exit' in user_input:
             break
+        elif 'text' in user_input:
+            user_input = input('Me:> ')
         user_command_entered, reset, states, relevance, temperature, topn, beam_width = process_user_command(
             user_input, states, relevance, temperature, topn, beam_width)
         if reset:
