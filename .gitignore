@@ -5,3 +5,5 @@ venv/
 models/
 reddit-parse/
 Ungaria.docx
+Logging.txt
+.env
