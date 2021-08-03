@@ -11,6 +11,8 @@ from time import ctime
 from urllib.request import urlopen
 from docx import Document
 import re
+import discord
+from dotenv import load_dotenv
 
 import folium
 import mysql.connector
@@ -98,10 +100,10 @@ class TalkingBot(object):
             self.db_manager = DBHandler()
         except mysql.connector.errors.InterfaceError:
             self.bot_speak('Sorry, but connection to data base failed...')
-            exit()
+            # exit()
         except ConnectionRefusedError:
             self.bot_speak('Sorry, but connection to data base failed...')
-            exit()
+            # exit()
         self.r = sr.Recognizer()
         self.m = sr.Microphone()
 
@@ -1233,6 +1235,12 @@ class TalkingBot(object):
         time.sleep(0.3)
         self.bot_speak('Thanks for your collaboration ... I have learned a lot from this conversation with you!')
 
+    # convert message content to response to use in real conversation
+    def convert_message_to_response(self, message):
+        intent = self.conversation_engine.predict_class(message.content)
+        response = self.conversation_engine.get_response(intent)
+        return response
+
     # conversation main method
     def respond(self, voice_data_local):
         if 'who are you' in voice_data_local:
@@ -1401,7 +1409,31 @@ class TalkingBot(object):
             self.respond(voice_data)
 
 
+client = discord.Client()
+load_dotenv(".env")
+MyBot = TalkingBot('Alexis', 'm')
+
+
+def run_discord():
+    client.run(os.getenv('TOKEN'))
+
+
+@client.event
+async def on_ready():
+    print('We have logged in as {0.user}'.format(client))
+
+
+@client.event
+async def on_message(message):
+    if message.author == client.user:
+        return
+
+    if 'alexis' in message.content or 'Alexis' in message.content:
+        response = MyBot.convert_message_to_response(message)
+        await message.channel.send(response)
+
+
 # driver code
 if __name__ == '__main__':
-    MyBot = TalkingBot('Alexis', 'm')
-    MyBot.run()
+    # MyBot.run()
+    run_discord()
