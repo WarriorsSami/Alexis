@@ -982,3 +982,49 @@ Alexis: I'm gonna use a pretrained model based on reddit comments. Be careful! I
 
 
 18:45:37
+
+
+18:31:27
+
+
+18:55:42
+
+
+19:06:09
+
+
+17:59:16
+
+
+18:06:25
+
+
+18:13:19
+
+Alexis: How can I help you, Sami?
+Sami: answer question
+Alexis: What would you want to know?
+Sami: what is golang
+
+10:45:09
+
+
+10:49:40
+
+
+12:21:37
+
+
+12:22:57
+
+
+18:54:26
+
+
+18:56:17
+
+
+18:57:40
+
+
+19:32:42

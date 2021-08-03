@@ -19,3 +19,4 @@ numpy~=1.19.5
 nltk~=3.6.1
 tensorflow~=2.4.1
 argparse~=1.4.0
+discord~=1.7.3
