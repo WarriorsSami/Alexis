@@ -23,7 +23,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_82a64425625945d8867a75c8b7db6c71 {
+                #map_6093b87dc0644aa480e0c0cc8ddc810d {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -35,15 +35,15 @@
 </head>
 <body>    
     
-            <div class="folium-map" id="map_82a64425625945d8867a75c8b7db6c71" ></div>
+            <div class="folium-map" id="map_6093b87dc0644aa480e0c0cc8ddc810d" ></div>
         
 </body>
 <script>    
     
-            var map_82a64425625945d8867a75c8b7db6c71 = L.map(
-                "map_82a64425625945d8867a75c8b7db6c71",
+            var map_6093b87dc0644aa480e0c0cc8ddc810d = L.map(
+                "map_6093b87dc0644aa480e0c0cc8ddc810d",
                 {
-                    center: [37.5112, 126.97410000000002],
+                    center: [46.0, 25.0],
                     crs: L.CRS.EPSG3857,
                     zoom: 13,
                     zoomControl: true,
@@ -55,39 +55,39 @@
 
         
     
-            var tile_layer_f14d0728b2cb4040a672b054cd843786 = L.tileLayer(
+            var tile_layer_096fac6c411d44d6a88987d7b2199314 = L.tileLayer(
                 "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                 {"attribution": "Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
-            ).addTo(map_82a64425625945d8867a75c8b7db6c71);
+            ).addTo(map_6093b87dc0644aa480e0c0cc8ddc810d);
         
     
-            var marker_61d96115769b4ec8b712580a3384a40d = L.marker(
-                [37.5112, 126.97410000000002],
+            var marker_f4980eb3b8994821a42d2123431774b8 = L.marker(
+                [46.0, 25.0],
                 {}
-            ).addTo(map_82a64425625945d8867a75c8b7db6c71);
+            ).addTo(map_6093b87dc0644aa480e0c0cc8ddc810d);
         
     
-        var popup_81c255438a944d62b320e6470eae5d35 = L.popup({"maxWidth": "100%"});
+        var popup_c424738ce95e4fcc90d38d232a1839ff = L.popup({"maxWidth": "100%"});
 
         
-            var html_31702628e6644d6ab493ed62b3379ce3 = $(`<div id="html_31702628e6644d6ab493ed62b3379ce3" style="width: 100.0%; height: 100.0%;">Here is your desired location</div>`)[0];
-            popup_81c255438a944d62b320e6470eae5d35.setContent(html_31702628e6644d6ab493ed62b3379ce3);
+            var html_538cb5a4bdc8456fbc64f85c0255d93a = $(`<div id="html_538cb5a4bdc8456fbc64f85c0255d93a" style="width: 100.0%; height: 100.0%;">Here is your desired location</div>`)[0];
+            popup_c424738ce95e4fcc90d38d232a1839ff.setContent(html_538cb5a4bdc8456fbc64f85c0255d93a);
         
 
-        marker_61d96115769b4ec8b712580a3384a40d.bindPopup(popup_81c255438a944d62b320e6470eae5d35)
+        marker_f4980eb3b8994821a42d2123431774b8.bindPopup(popup_c424738ce95e4fcc90d38d232a1839ff)
         ;
 
         
     
     
                 function newMarker(e){
-                    var new_mark = L.marker().setLatLng(e.latlng).addTo(map_82a64425625945d8867a75c8b7db6c71);
+                    var new_mark = L.marker().setLatLng(e.latlng).addTo(map_6093b87dc0644aa480e0c0cc8ddc810d);
                     new_mark.dragging.enable();
-                    new_mark.on('dblclick', function(e){ map_82a64425625945d8867a75c8b7db6c71.removeLayer(e.target)})
+                    new_mark.on('dblclick', function(e){ map_6093b87dc0644aa480e0c0cc8ddc810d.removeLayer(e.target)})
                     var lat = e.latlng.lat.toFixed(4),
                        lng = e.latlng.lng.toFixed(4);
                     new_mark.bindPopup("Waypoint");
                     };
-                map_82a64425625945d8867a75c8b7db6c71.on('click', newMarker);
+                map_6093b87dc0644aa480e0c0cc8ddc810d.on('click', newMarker);
             
 </script>

@@ -54,7 +54,9 @@ from audio_engine import AudioEngine
 # ---- to be continued
 class TalkingBot(object):
     # constructor
-    def __init__(self, name, sex):
+    def __init__(self, name, sex, client_discord):
+        self.config = getAppConfig("./settings.json")
+        self.client_discord = client_discord
         self.is_engaged = False
         self.channel = None
         self.name = name
@@ -171,19 +173,22 @@ class TalkingBot(object):
         os.remove(audio_file)
 
     # custom language voice
-    def bot_speak_language(self, command, language):
-        tts = gTTS(text=command, lang=language)
-        rand = random.randint(1, 10000000)
-        audio_file = 'audio-' + str(rand) + '.mp3'
-        tts.save(audio_file)
-        playsound.playsound(audio_file)
-        print('\n' + command)
-        if self.record is True:
-            if language in 'ru el zh ja ko ar':
-                self.logs.write('\nAlexis: ' + 'Encoding characters not supported in ' + language)
-            else:
-                self.logs.write('\nAlexis: ' + command + ' - in ' + language)
-        os.remove(audio_file)
+    async def bot_speak_language(self, command, language):
+        if self.sex == 'discord':
+            await self.bot_speak_to_discord(command)
+        else:
+            tts = gTTS(text=command, lang=language)
+            rand = random.randint(1, 10000000)
+            audio_file = 'audio-' + str(rand) + '.mp3'
+            tts.save(audio_file)
+            playsound.playsound(audio_file)
+            print('\n' + command)
+            if self.record is True:
+                if language in 'ru el zh ja ko ar':
+                    self.logs.write('\nAlexis: ' + 'Encoding characters not supported in ' + language)
+                else:
+                    self.logs.write('\nAlexis: ' + command + ' - in ' + language)
+            os.remove(audio_file)
 
     # bot voice (sync)
     async def bot_speak(self, command):
@@ -203,7 +208,7 @@ class TalkingBot(object):
     # listen to audio thread
     async def record_audio(self):
         if self.sex == 'discord':
-            message = await client.wait_for('message', timeout=60.0)
+            message = await self.client_discord.wait_for('message', timeout=100.0)
             self.speech_unrecognizable = False
             return message.content.lower()
         else:
@@ -466,7 +471,7 @@ class TalkingBot(object):
         url = 'https://google.nl/maps/place/' + search_for + "/&amp;"
         webbrowser.get().open(url)
 
-        await self.bot_speak('Here is the location of ' + search_for)
+        await self.bot_speak(f'Here is the location for {search_for}: {url}')
         self.is_engaged = False
 
     # play favourite music on youtube
@@ -865,15 +870,14 @@ class TalkingBot(object):
         await self.bot_speak(pyjokes.get_joke())
 
     # send email
-    @staticmethod
-    async def send_email_protocol(to, content):
+    def send_email_protocol(self, to, content):
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.ehlo()
         server.starttls()
 
         # Enable low security in gmail
-        server.login('usertechsavvy@gmail.com', 'firmaitinfo')
-        server.sendmail('usertechsavvy@gmail.com', to, content)
+        server.login(self.config['email'], self.config['password'])
+        server.sendmail(self.config['email'], to, content)
         server.close()
 
     # main method send email
@@ -886,11 +890,15 @@ class TalkingBot(object):
                 if self.speech_unrecognizable is False:
                     break
 
-            await self.bot_speak("Whom should I send this email?")
-            to = input()
-            await self.send_email_protocol(to, content)
+            await self.bot_speak("Who should I send this email to?")
+            while True:
+                to = await self.record_audio()
+                if self.speech_unrecognizable is False:
+                    break
+            self.send_email_protocol(to, content)
             await self.bot_speak("Email has been sent!")
-        except smtplib.SMTPException:
+        except smtplib.SMTPException as e:
+            print(e)
             await self.bot_speak("I am not able to send this email")
         self.is_engaged = False
 
@@ -1063,11 +1071,11 @@ class TalkingBot(object):
 
             await self.bot_speak('Text before translation is: ')
             time.sleep(0.1)
-            self.bot_speak_language(text, self.lang_dict[lang1])
+            await self.bot_speak_language(text, self.lang_dict[lang1])
 
             await self.bot_speak('Text after translation is: ')
             time.sleep(0.1)
-            self.bot_speak_language(translation, self.lang_dict[lang2])
+            await self.bot_speak_language(translation, self.lang_dict[lang2])
 
         else:
             await self.bot_speak('Wrong language id provided')
@@ -1146,7 +1154,10 @@ class TalkingBot(object):
     async def track_ip(self):
         gip = pygeoip.GeoIP('GeoLiteCity.dat')
         await self.bot_speak('Please provide a suitable IP address to be tracked')
-        my_ip = input()
+        while True:
+            my_ip = await self.record_audio()
+            if self.speech_unrecognizable is False:
+                break
 
         time.sleep(0.1)
         await self.bot_speak('IP tracker engine is being initialized... Please wait...')
@@ -1156,6 +1167,7 @@ class TalkingBot(object):
         try:
             for key, val in res.items():
                 print('%s: %s' % (key, val))
+                await self.bot_speak(str(key) + ': ' + str(val))
             # await self.bot_speak('Latitude: %s \nLongitude: %s' % (res['latitude'], res['longitude']))
 
             m = folium.Map(
@@ -1182,9 +1194,17 @@ class TalkingBot(object):
         wikipedia.set_lang('ro')
 
         await self.bot_speak('Provide the subject of the essay')
-        title = input('Essay\'s topic: ')
+        # title = input('Essay\'s topic: ')
+        while True:
+            title = await self.record_audio()
+            if self.speech_unrecognizable is False:
+                break
         await self.bot_speak('Now, provide the name of the author')
-        name = input('Author\'s name: ')
+        # name = input('Author\'s name: ')
+        while True:
+            name = await self.record_audio()
+            if self.speech_unrecognizable is False:
+                break
 
         try:
             wikipage = wikipedia.page(title)
@@ -1205,13 +1225,13 @@ class TalkingBot(object):
         paragraph = document.add_paragraph("    " + text)
         document.save(title + '.docx')
 
+        await self.channel.send(file=discord.File(f'{title}.docx'))
         await self.bot_speak('Your essay is ready my friend!')
 
     # pbinfo bot invoke
     async def pbinfo_invoke(self):
         self.is_engaged = True
-        config = getAppConfig("./settings.json")
-        AppPbinfo = App(config)
+        AppPbinfo = App(self.config)
 
         await self.bot_speak('Let me know what action you want to perform on pbinfo...')
         time.sleep(0.3)
@@ -1284,7 +1304,7 @@ class TalkingBot(object):
                 'I\'m gonna use a pretrained model based on reddit comments. Be careful! I cannot control '
                 'myself in this state ...')
             time.sleep(0.3)
-            main(AudioEngine(self.engine))
+            await main(AudioEngine(self.engine, self))
 
         time.sleep(0.3)
         await self.bot_speak('Thanks for your collaboration ... I have learned a lot from this conversation with you!')
@@ -1367,9 +1387,6 @@ class TalkingBot(object):
         elif 'joke' in voice_data_local:
             await self.say_joke()
 
-        elif self.name.lower() in voice_data_local:
-            await self.yes_sir()
-
         elif 'describe yourself' in voice_data_local:
             await self.describe()
 
@@ -1428,7 +1445,7 @@ class TalkingBot(object):
             await self.start_conversation()
 
         else:
-            await self.say_default()
+            await self.yes_sir()
 
     # wait for being called and start conversation
     async def run(self):
@@ -1475,7 +1492,7 @@ class TalkingBot(object):
 
 client = discord.Client()
 load_dotenv(".env")
-MyBot = TalkingBot('Alexis', 'discord')
+MyBot = TalkingBot('Alexis', 'discord', client)
 
 
 def run_discord():

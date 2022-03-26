@@ -13,7 +13,7 @@ import tensorflow as tf
 from model import Model
 
 
-def main(engine):
+async def main(engine):
     tf.compat.v1.disable_eager_execution()
     assert sys.version_info >= (3, 3), \
         "Must be run in Python 3.3 or later. You are running {}".format(sys.version)
@@ -38,7 +38,7 @@ def main(engine):
                              'noticeably degrading coherence;'
                              'set to <0 to disable relevance masking')
     args = parser.parse_args()
-    sample_main(args, engine)
+    await sample_main(args, engine)
 
 
 def get_paths(input_path):
@@ -59,7 +59,7 @@ def get_paths(input_path):
     return model_path, os.path.join(save_dir, 'config.pkl'), os.path.join(save_dir, 'chars_vocab.pkl')
 
 
-def sample_main(args, engine):
+async def sample_main(args, engine):
     model_path, config_path, vocab_path = get_paths(args.save_dir)
     # Arguments passed to sample.py direct us to a saved model.
     # Load the separate arguments by which that model was previously trained.
@@ -83,7 +83,7 @@ def sample_main(args, engine):
         # Restore the saved variables, replacing the initialized values.
         print("Restoring weights...")
         saver.restore(sess, model_path)
-        chatbot(net, sess, chars, vocab, args.n, args.beam_width,
+        await chatbot(net, sess, chars, vocab, args.n, args.beam_width,
                 args.relevance, args.temperature, args.topn, engine)
 
 
@@ -133,11 +133,11 @@ def possibly_escaped_char(raw_chars):
     return raw_chars[-1]
 
 
-def chatbot(net, sess, chars, vocab, max_length, beam_width, relevance, temperature, topn, engine):
+async def chatbot(net, sess, chars, vocab, max_length, beam_width, relevance, temperature, topn, engine):
     states = initial_state_with_relevance_masking(net, sess, relevance)
-    engine.bot_speak('Talk to me!')
+    await engine.bot_speak('Talk to me!')
     while True:
-        user_input = engine.record_main()
+        user_input = await engine.record_main()
         if 'exit' in user_input:
             break
         elif 'text' in user_input:
@@ -159,6 +159,7 @@ def chatbot(net, sess, chars, vocab, max_length, beam_width, relevance, temperat
                                                                               'temperature': temperature, 'topn': topn})
             out_chars = []
             print('\nAlexis\' thoughts: ')
+            await engine.bot_speak('**I\'m thinking...**')
             for i, char_token in enumerate(computer_response_generator):
                 out_chars.append(chars[char_token])
                 print(possibly_escaped_char(out_chars), end='', flush=True)
@@ -167,7 +168,7 @@ def chatbot(net, sess, chars, vocab, max_length, beam_width, relevance, temperat
                     break
             states = forward_text(net, sess, states, relevance, vocab, sanitize_text(vocab, "\n> "))
             text = ''.join(out_chars)
-            engine.bot_speak(text)
+            await engine.bot_speak(text)
 
 
 def process_user_command(user_input, states, relevance, temperature, topn, beam_width):
