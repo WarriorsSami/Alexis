@@ -55,6 +55,8 @@ from audio_engine import AudioEngine
 class TalkingBot(object):
     # constructor
     def __init__(self, name, sex):
+        self.is_engaged = False
+        self.channel = None
         self.name = name
         self.sex = sex
         self.speech_unrecognizable = False
@@ -94,28 +96,29 @@ class TalkingBot(object):
         self.logs.write(str_time + '\n')
 
         self.brain = NeuralNetworkLoader()
+        self.brain.updateNeuralNetwork()
         self.conversation_engine = ConversationMode()
 
-        try:
-            self.db_manager = DBHandler()
-        except mysql.connector.errors.InterfaceError:
-            self.bot_speak('Sorry, but connection to data base failed...')
-            # exit()
-        except ConnectionRefusedError:
-            self.bot_speak('Sorry, but connection to data base failed...')
-            # exit()
+        # try:
+        #     self.db_manager = DBHandler()
+        # except mysql.connector.errors.InterfaceError:
+        #     await self.bot_speak('Sorry, but connection to data base failed...')
+        #     # exit()
+        # except ConnectionRefusedError:
+        #     await self.bot_speak('Sorry, but connection to data base failed...')
+        #     # exit()
         self.r = sr.Recognizer()
         self.m = sr.Microphone()
 
     # change voice format
-    def change_voice(self):
-        self.bot_speak('My voice is gonna be switched...')
+    async def change_voice(self):
+        await self.bot_speak('My voice is gonna be switched...')
 
         if self.sex == 'm':
             self.sex = 'f'
             self.bot_speak_m('Choose your favourite feminine voice ID: 0, 1 or 2')
             while True:
-                voice = self.record_audio()
+                voice = await self.record_audio()
                 if self.speech_unrecognizable is False and voice.isnumeric() is True:
                     break
 
@@ -183,7 +186,7 @@ class TalkingBot(object):
         os.remove(audio_file)
 
     # bot voice (sync)
-    def bot_speak(self, command):
+    async def bot_speak(self, command):
         print('\nAlexis: ' + command)
         if self.sex == 'm':
             self.bot_speak_m(command)
@@ -192,82 +195,94 @@ class TalkingBot(object):
                 self.bot_speak_f(command)
             elif self.sex == 'f1':
                 self.bot_speak_h(command)
+            elif self.sex == 'discord':
+                await self.bot_speak_to_discord(command)
             else:
                 self.bot_speak_z(command)
 
     # listen to audio thread
-    def record_audio(self):
-        self.speech_unrecognizable = False
-        with self.m as source:
-            self.r.adjust_for_ambient_noise(source)
-            audio = self.r.listen(source)
-            voice_data_local = ''
-            try:
-                voice_data_local = self.r.recognize_google(audio)
-                if self.record is True:
-                    self.logs.write('\nSami: ' + voice_data_local)
-            except sr.UnknownValueError:
-                if random.randint(1, 1000) % 10 == 0:
-                    self.bot_speak('Sorry, I did not get that')
-                self.speech_unrecognizable = True
-            except sr.RequestError:
-                self.bot_speak('Sorry, my speech service is not working. I will stop my execution thread')
-                exit()
-            print('\nMe: ' + voice_data_local)
-            if 'text' in voice_data_local or 'write' in voice_data_local:
-                voice_data_local = input("Enter text:> ")
-            return voice_data_local.lower()
+    async def record_audio(self):
+        if self.sex == 'discord':
+            message = await client.wait_for('message', timeout=60.0)
+            self.speech_unrecognizable = False
+            return message.content.lower()
+        else:
+            self.speech_unrecognizable = False
+            with self.m as source:
+                self.r.adjust_for_ambient_noise(source)
+                audio = self.r.listen(source)
+                voice_data_local = ''
+                try:
+                    voice_data_local = self.r.recognize_google(audio)
+                    if self.record is True:
+                        self.logs.write('\nSami: ' + voice_data_local)
+                except sr.UnknownValueError:
+                    if random.randint(1, 1000) % 10 == 0:
+                        await self.bot_speak('Sorry, I did not get that')
+                    self.speech_unrecognizable = True
+                except sr.RequestError:
+                    await self.bot_speak('Sorry, my speech service is not working. I will stop my execution thread')
+                    exit()
+                print('\nMe: ' + voice_data_local)
+                if 'text' in voice_data_local or 'write' in voice_data_local:
+                    voice_data_local = input("Enter text:> ")
+                return voice_data_local.lower()
 
     # self presentation
-    def say_my_name(self):
-        self.bot_speak('My name is ' + self.name + ' and I am your personal voice assistant')
+    async def say_my_name(self):
+        await self.bot_speak('My name is ' + self.name + ' and I am your personal voice assistant')
 
     # tell current time
-    def get_current_time(self):
-        self.bot_speak('The current time is ' + ctime())
+    async def get_current_time(self):
+        await self.bot_speak('The current time is ' + ctime())
 
     # search something on google
-    def search_for(self):
-        self.bot_speak('What do you want to search for?')
+    async def search_for(self):
+        self.is_engaged = True
+        await self.bot_speak('What do you want to search for?')
 
         while True:
-            search_for = self.record_audio()
+            search_for = await self.record_audio()
             if self.speech_unrecognizable is False:
                 break
 
         url = 'https://google.com/search?q=' + search_for
         webbrowser.get().open(url)
 
-        self.bot_speak('Here is what I found for ' + search_for)
+        await self.bot_speak('Here is what I found for ' + search_for)
+        self.is_engaged = False
 
     # answer questions weak AI
-    def answer_question(self):
+    async def answer_question(self):
+        self.is_engaged = True
         app_id = 'JE3QXR-V3EL6T3XU7'
-        client = wolframalpha.Client(app_id)
+        client_local = wolframalpha.Client(app_id)
 
-        self.bot_speak('What would you want to know?')
+        await self.bot_speak('What would you want to know?')
         while True:
-            question = self.record_audio()
+            question = await self.record_audio()
             if self.speech_unrecognizable is False:
                 break
 
         try:
-            res = client.query(question)
+            res = client_local.query(question)
             answer = next(res.results).text
-            self.bot_speak('Your desired answer is: ' + answer)
+            await self.bot_speak('Your desired answer is: ' + answer)
         except AttributeError:
-            self.bot_speak('Answer question API collapsed...')
+            await self.bot_speak('Answer question API collapsed...')
             exit()
         except KeyError:
-            self.bot_speak('Answer question API collapsed...')
+            await self.bot_speak('Answer question API collapsed...')
             exit()
+        self.is_engaged = False
 
     # access php project menu
-    def access_project(self):
-        self.bot_speak('What project page do you want to open?')
+    async def access_project(self):
+        self.is_engaged = True
+        await self.bot_speak('What project page do you want to open?')
 
         while True:
-            search_for = self.record_audio()
+            search_for = await self.record_audio()
             if self.speech_unrecognizable is False:
                 break
         before = search_for
@@ -317,44 +332,44 @@ class TalkingBot(object):
             elif 'join' in search_for:
                 search_for = 'general'
 
-                self.bot_speak('You have 10 join panels available. Which one do you wanna launch?')
+                await self.bot_speak('You have 10 join panels available. Which one do you wanna launch?')
 
                 while True:
-                    voice_data = self.record_audio()
+                    voice_data = await self.record_audio()
                     if self.speech_unrecognizable is False and voice_data.isnumeric() is True:
                         break
 
                 after = '?panel=' + voice_data + '&play=' + voice_data
                 if int(voice_data) == 3:
-                    self.bot_speak('Please enter a software product id for panel 3')
+                    await self.bot_speak('Please enter a software product id for panel 3')
 
                     while True:
-                        voice_data = self.record_audio()
+                        voice_data = await self.record_audio()
                         if self.speech_unrecognizable is False and voice_data.isnumeric() is True:
                             break
                     after += '&id1=' + voice_data
 
                 elif int(voice_data) == 5:
-                    self.bot_speak('Please enter a wage value for panel 5')
+                    await self.bot_speak('Please enter a wage value for panel 5')
 
                     while True:
-                        voice_data = self.record_audio()
+                        voice_data = await self.record_audio()
                         if self.speech_unrecognizable is False and voice_data.isnumeric() is True:
                             break
                     after += '&id2=' + voice_data
 
-                    self.bot_speak('Now, enter a valid year')
+                    await self.bot_speak('Now, enter a valid year')
 
                     while True:
-                        voice_data = self.record_audio()
+                        voice_data = await self.record_audio()
                         if self.speech_unrecognizable is False and voice_data.isnumeric() is True:
                             break
                     after += '&id1=' + voice_data
 
-                    self.bot_speak('Now, enter a valid month number')
+                    await self.bot_speak('Now, enter a valid month number')
 
                     while True:
-                        voice_data = self.record_audio()
+                        voice_data = await self.record_audio()
                         if self.speech_unrecognizable is False and voice_data.isnumeric() is True:
                             break
                     add = '-'
@@ -362,10 +377,10 @@ class TalkingBot(object):
                         add = '-0'
                     after += add + voice_data
 
-                    self.bot_speak('Now, enter a valid day number')
+                    await self.bot_speak('Now, enter a valid day number')
 
                     while True:
-                        voice_data = self.record_audio()
+                        voice_data = await self.record_audio()
                         if self.speech_unrecognizable is False and voice_data.isnumeric() is True:
                             break
                     add = '-'
@@ -374,54 +389,54 @@ class TalkingBot(object):
                     after += add + voice_data
 
                 elif int(voice_data) == 6:
-                    self.bot_speak('Please enter an employee id for panel 6')
+                    await self.bot_speak('Please enter an employee id for panel 6')
 
                     while True:
-                        voice_data = self.record_audio()
+                        voice_data = await self.record_audio()
                         if self.speech_unrecognizable is False and voice_data.isnumeric() is True:
                             break
                     after += '&id1=' + voice_data
 
                 elif int(voice_data) == 7:
-                    self.bot_speak('Please enter a customer id for panel 7')
+                    await self.bot_speak('Please enter a customer id for panel 7')
 
                     while True:
-                        voice_data = self.record_audio()
+                        voice_data = await self.record_audio()
                         if self.speech_unrecognizable is False and voice_data.isnumeric() is True:
                             break
                     after += '&id1=' + voice_data
 
                 elif int(voice_data) == 8:
-                    self.bot_speak('Please enter a software product id for panel 8')
+                    await self.bot_speak('Please enter a software product id for panel 8')
 
                     while True:
-                        voice_data = self.record_audio()
+                        voice_data = await self.record_audio()
                         if self.speech_unrecognizable is False and voice_data.isnumeric() is True:
                             break
                     after += '&id1=' + voice_data
 
                 elif int(voice_data) == 9:
-                    self.bot_speak('Please enter a department id for panel 9')
+                    await self.bot_speak('Please enter a department id for panel 9')
 
                     while True:
-                        voice_data = self.record_audio()
+                        voice_data = await self.record_audio()
                         if self.speech_unrecognizable is False and voice_data.isnumeric() is True:
                             break
                     after += '&id1=' + voice_data
 
                 elif int(voice_data) == 10:
-                    self.bot_speak('Please enter a team id for panel 10')
+                    await self.bot_speak('Please enter a team id for panel 10')
 
                     while True:
-                        voice_data = self.record_audio()
+                        voice_data = await self.record_audio()
                         if self.speech_unrecognizable is False and voice_data.isnumeric() is True:
                             break
                     after += '&id1=' + voice_data
 
-                    self.bot_speak('Please enter a department id for panel 10')
+                    await self.bot_speak('Please enter a department id for panel 10')
 
                     while True:
-                        voice_data = self.record_audio()
+                        voice_data = await self.record_audio()
                         if self.speech_unrecognizable is False and voice_data.isnumeric() is True:
                             break
                     after += '&id2=' + voice_data
@@ -430,33 +445,37 @@ class TalkingBot(object):
                 search_for = 'quizz'
                 break
             else:
-                self.bot_speak('Try a valid project page name')
+                await self.bot_speak('Try a valid project page name')
 
         url = 'http://localhost/Proiect%20Info/' + search_for + '.php' + after
         webbrowser.get().open(url)
 
-        self.bot_speak('Here is the project page for ' + before + ' command')
+        await self.bot_speak('Here is the project page for ' + before + ' command')
+        self.is_engaged = False
 
     # find a given location on google maps
-    def find_location(self):
-        self.bot_speak('What is the location you wanna find?')
+    async def find_location(self):
+        self.is_engaged = True
+        await self.bot_speak('What is the location you wanna find?')
 
         while True:
-            search_for = self.record_audio()
+            search_for = await self.record_audio()
             if self.speech_unrecognizable is False:
                 break
 
         url = 'https://google.nl/maps/place/' + search_for + "/&amp;"
         webbrowser.get().open(url)
 
-        self.bot_speak('Here is the location of ' + search_for)
+        await self.bot_speak('Here is the location of ' + search_for)
+        self.is_engaged = False
 
     # play favourite music on youtube
-    def play_music(self):
-        self.bot_speak('What song do you wanna listen?')
+    async def play_music(self):
+        self.is_engaged = True
+        await self.bot_speak('What song do you wanna listen?')
 
         while True:
-            search_for = self.record_audio()
+            search_for = await self.record_audio()
             if self.speech_unrecognizable is False:
                 break
 
@@ -467,7 +486,7 @@ class TalkingBot(object):
         try:
             driver.get(url='https://www.youtube.com/results?search_query=' + search_for)
         except selenium.common.exceptions.SessionNotCreatedException:
-            self.bot_speak('Sorry, but session has just collapsed and me too...')
+            await self.bot_speak('Sorry, but session has just collapsed and me too...')
             exit()
 
         while True:
@@ -476,7 +495,7 @@ class TalkingBot(object):
                 video.click()
                 break
             except selenium.common.exceptions.ElementClickInterceptedException:
-                self.bot_speak('Sorry, but session has just collapsed and me too...')
+                await self.bot_speak('Sorry, but session has just collapsed and me too...')
                 exit()
             except selenium.common.exceptions.NoSuchElementException:
                 skip = driver.find_element_by_xpath('/html/body/div[2]/div[3]/form/input[12]')
@@ -500,11 +519,11 @@ class TalkingBot(object):
         wait.until(visible((By.ID, "video-title")))
         driver.find_element_by_id("video-title").click()
 
-        self.bot_speak('Here is your song: ' + search_for)
+        await self.bot_speak('Here is your song: ' + search_for)
         time.sleep(0.3)
         while True:
             while True:
-                command = self.record_audio()
+                command = await self.record_audio()
                 if self.speech_unrecognizable is False:
                     break
 
@@ -519,57 +538,59 @@ class TalkingBot(object):
             elif 'exit' in command:
                 break
         driver.close()
-        self.bot_speak('The video has finished. Enter into the main mode for requesting another one!')
+        await self.bot_speak('The video has finished. Enter into the main mode for requesting another one!')
+        self.is_engaged = False
 
     # similar to destructor - turn off bot
-    def exit(self):
-        self.bot_speak('See you later!')
+    async def exit(self):
+        await self.bot_speak('See you later!')
         toast = ToastNotifier()
         toast.show_toast("Alexis API", "Alexis Voice Assistant has just deactivated itself!", duration=3)
         exit()
 
     # turn off PC
-    def shutdown(self):
-        self.bot_speak('The system is gonna collapse...')
+    async def shutdown(self):
+        await self.bot_speak('The system is gonna collapse...')
         os.system("shutdown /s /t 1")
 
     # restart PC
-    def restart(self):
-        self.bot_speak('The system is gonna be refreshed...')
+    async def restart(self):
+        await self.bot_speak('The system is gonna be refreshed...')
         os.system("shutdown /r /t 1")
 
     # funny guessing game
-    def start_game(self):
-        self.bot_speak('The game is gonna begin... Please wait...')
+    async def start_game(self):
+        self.is_engaged = True
+        await self.bot_speak('The game is gonna begin... Please wait...')
         time.sleep(1)
 
         guess = ''
         words = []
-        self.bot_speak('How many words do you want to insert?')
+        await self.bot_speak('How many words do you want to insert?')
         while True:
-            cnt = self.record_audio()
+            cnt = await self.record_audio()
             if self.speech_unrecognizable is False and cnt.isnumeric() is True:
                 break
 
-        self.bot_speak('You must insert ' + cnt + ' words')
+        await self.bot_speak('You must insert ' + cnt + ' words')
         for i in range(0, int(cnt)):
             if i == 0:
-                self.bot_speak('Now, give me a word')
+                await self.bot_speak('Now, give me a word')
             elif i == int(cnt) - 1:
-                self.bot_speak('Now, give me the last word')
+                await self.bot_speak('Now, give me the last word')
             else:
-                self.bot_speak('Now, give me another word')
+                await self.bot_speak('Now, give me another word')
             while True:
-                voice_data = self.record_audio()
+                voice_data = await self.record_audio()
                 if self.speech_unrecognizable is False:
                     break
             words.append(voice_data)
-            self.bot_speak(voice_data + ' has been inserted')
+            await self.bot_speak(voice_data + ' has been inserted')
 
-        self.bot_speak('Words successfully registered!')
+        await self.bot_speak('Words successfully registered!')
         num_guesses = 3
         prompt_limit = 5
-        self.bot_speak('Start game!')
+        await self.bot_speak('Start game!')
         time.sleep(0.3)
 
         # get a random word from the list
@@ -584,7 +605,7 @@ class TalkingBot(object):
 
         # show instructions and wait 3 seconds before starting the game
         # print(instructions)
-        self.bot_speak(instructions)
+        await self.bot_speak(instructions)
         time.sleep(1)
 
         for i in range(num_guesses):
@@ -597,13 +618,13 @@ class TalkingBot(object):
             #     re-prompt the user to say their guess again. Do this up
             #     to prompt_limit times
             for j in range(prompt_limit):
-                self.bot_speak('Guess {}. Speak!'.format(i + 1))
-                guess = self.record_audio()
+                await self.bot_speak('Guess {}. Speak!'.format(i + 1))
+                guess = await self.record_audio()
                 if self.speech_unrecognizable is False:
                     break
 
             # show the user the transcription
-            self.bot_speak("You said: {}".format(guess))
+            await self.bot_speak("You said: {}".format(guess))
 
             # determine if guess is correct and if any attempts remain
             guess_is_correct = guess.lower() == word.lower()
@@ -613,20 +634,22 @@ class TalkingBot(object):
             # if not, repeat the loop if user has more attempts
             # if no attempts left, the user loses the game
             if guess_is_correct:
-                self.bot_speak("Correct! You win!".format(word))
+                await self.bot_speak("Correct! You win!".format(word))
                 break
             elif user_has_more_attempts:
-                self.bot_speak("Incorrect. Try again.")
+                await self.bot_speak("Incorrect. Try again.")
             else:
-                self.bot_speak("Sorry, you lose!\nI was thinking of '{}'.".format(word))
+                await self.bot_speak("Sorry, you lose!\nI was thinking of '{}'.".format(word))
                 break
+        self.is_engaged = False
 
     # voice mimetic
-    def repeat_after_me(self):
-        self.bot_speak('What do you want me to repeat?')
+    async def repeat_after_me(self):
+        self.is_engaged = True
+        await self.bot_speak('What do you want me to repeat?')
 
         while True:
-            voice_data = self.record_audio()
+            voice_data = await self.record_audio()
             if self.speech_unrecognizable is False:
                 break
 
@@ -635,179 +658,183 @@ class TalkingBot(object):
         # engine.bot_speak(voice_data)
         # time.sleep(0.3)
 
-        self.bot_speak('You said: ' + voice_data)
+        await self.bot_speak('You said: ' + voice_data)
+        self.is_engaged = False
 
     # main method for SQL queries
-    def launch_sql(self):
+    async def launch_sql(self):
+        self.is_engaged = True
         while True:
-            self.bot_speak('What kind of SQL query do you wanna perform?')
+            await self.bot_speak('What kind of SQL query do you wanna perform?')
 
             while True:
-                voice_data = self.record_audio()
+                voice_data = await self.record_audio()
                 if self.speech_unrecognizable is False:
                     break
 
             if 'insert' in voice_data:
                 while True:
-                    self.bot_speak('What do you want to insert into the data base?')
+                    await self.bot_speak('What do you want to insert into the data base?')
 
                     while True:
-                        voice_data = self.record_audio()
+                        voice_data = await self.record_audio()
                         if self.speech_unrecognizable is False:
                             break
 
                     if 'employee' in voice_data:
-                        self.bot_speak('Your choice is to insert employees. How many employees do you wanna '
-                                       'insert?')
+                        await self.bot_speak('Your choice is to insert employees. How many employees do you wanna '
+                                             'insert?')
 
                         while True:
-                            voice_data = self.record_audio()
+                            voice_data = await self.record_audio()
                             if self.speech_unrecognizable is False:
                                 break
 
-                        self.bot_speak('Your choice is to insert ' + voice_data + ' employees')
+                        await self.bot_speak('Your choice is to insert ' + voice_data + ' employees')
 
                         try:
                             self.db_manager.insert_query('employee', voice_data)
                         except mysql.connector.errors.ProgrammingError:
-                            self.bot_speak('Something went wrong and handler collapsed... Bye bye!')
+                            await self.bot_speak('Something went wrong and handler collapsed... Bye bye!')
                             exit()
 
-                        self.bot_speak(voice_data + ' employees inserted successfully!')
+                        await self.bot_speak(voice_data + ' employees inserted successfully!')
 
                     elif 'customer' in voice_data:
-                        self.bot_speak('Your choice is to insert customers. How many customers do you wanna '
-                                       'insert?')
+                        await self.bot_speak('Your choice is to insert customers. How many customers do you wanna '
+                                             'insert?')
 
                         while True:
-                            voice_data = self.record_audio()
+                            voice_data = await self.record_audio()
                             if self.speech_unrecognizable is False:
                                 break
 
-                        self.bot_speak('Your choice is to insert ' + voice_data + ' customers')
+                        await self.bot_speak('Your choice is to insert ' + voice_data + ' customers')
 
                         try:
                             self.db_manager.insert_query('customer', voice_data)
                         except mysql.connector.errors.ProgrammingError:
-                            self.bot_speak('Something went wrong and handler collapsed... Bye bye!')
+                            await self.bot_speak('Something went wrong and handler collapsed... Bye bye!')
                             exit()
 
-                        self.bot_speak(voice_data + ' customers inserted successfully!')
+                        await self.bot_speak(voice_data + ' customers inserted successfully!')
 
                     elif 'order' in voice_data:
-                        self.bot_speak('Your choice is to insert orders. How many orders do you wanna '
-                                       'insert?')
+                        await self.bot_speak('Your choice is to insert orders. How many orders do you wanna '
+                                             'insert?')
 
                         while True:
-                            voice_data = self.record_audio()
+                            voice_data = await self.record_audio()
                             if self.speech_unrecognizable is False:
                                 break
 
-                        self.bot_speak('Your choice is to insert ' + voice_data + ' orders')
+                        await self.bot_speak('Your choice is to insert ' + voice_data + ' orders')
 
                         try:
                             self.db_manager.insert_query('order', voice_data)
                         except mysql.connector.errors.ProgrammingError:
-                            self.bot_speak('Something went wrong and handler collapsed... Bye bye!')
+                            await self.bot_speak('Something went wrong and handler collapsed... Bye bye!')
                             exit()
 
-                        self.bot_speak(voice_data + ' orders inserted successfully!')
+                        await self.bot_speak(voice_data + ' orders inserted successfully!')
 
                     elif 'project' in voice_data:
-                        self.bot_speak('Your choice is to insert projects. How many projects do you wanna '
-                                       'insert?')
+                        await self.bot_speak('Your choice is to insert projects. How many projects do you wanna '
+                                             'insert?')
 
                         while True:
-                            voice_data = self.record_audio()
+                            voice_data = await self.record_audio()
                             if self.speech_unrecognizable is False:
                                 break
 
-                        self.bot_speak('Your choice is to insert ' + voice_data + ' projects')
+                        await self.bot_speak('Your choice is to insert ' + voice_data + ' projects')
 
                         try:
                             self.db_manager.insert_query('project', voice_data)
                         except mysql.connector.errors.ProgrammingError:
-                            self.bot_speak('Something went wrong and handler collapsed... Bye bye!')
+                            await self.bot_speak('Something went wrong and handler collapsed... Bye bye!')
                             exit()
 
-                        self.bot_speak(voice_data + ' projects inserted successfully!')
+                        await self.bot_speak(voice_data + ' projects inserted successfully!')
 
                     elif 'team' in voice_data:
-                        self.bot_speak('Your choice is to insert teams. How many teams do you wanna '
-                                       'insert?')
+                        await self.bot_speak('Your choice is to insert teams. How many teams do you wanna '
+                                             'insert?')
 
                         while True:
-                            voice_data = self.record_audio()
+                            voice_data = await self.record_audio()
                             if self.speech_unrecognizable is False:
                                 break
 
-                        self.bot_speak('Your choice is to insert ' + voice_data + ' teams')
+                        await self.bot_speak('Your choice is to insert ' + voice_data + ' teams')
 
                         try:
                             self.db_manager.insert_query('team', voice_data)
                         except mysql.connector.errors.ProgrammingError:
-                            self.bot_speak('Something went wrong and handler collapsed... Bye bye!')
+                            await self.bot_speak('Something went wrong and handler collapsed... Bye bye!')
                             exit()
 
-                        self.bot_speak(voice_data + ' teams inserted successfully!')
+                        await self.bot_speak(voice_data + ' teams inserted successfully!')
 
                     elif 'finish insert' in voice_data:
                         break
 
                     else:
-                        self.say_default()
+                        await self.say_default()
 
             elif 'finish query' in voice_data:
                 break
 
             else:
-                self.say_default()
+                await self.say_default()
 
-        self.bot_speak('SQL Query session finished')
+        await self.bot_speak('SQL Query session finished')
+        self.is_engaged = False
 
     # provide short personal description
-    def describe(self):
-        self.bot_speak('I am a personal voice assistant implemented using Python Speech Recognition'
-                       ' and the very love of my creator. I have many different names, including'
-                       ' Valentine, Valerian, Jarvis or even Alexis. Ask me what you wanna'
-                       ' know and I will answer you as soon as possible. Enjoy the party!')
+    async def describe(self):
+        await self.bot_speak('I am a personal voice assistant implemented using Python Speech Recognition'
+                             ' and the very love of my creator. I have many different names, including'
+                             ' Valentine, Valerian, Jarvis or even Alexis. Ask me what you wanna'
+                             ' know and I will answer you as soon as possible. Enjoy the party!')
 
     # provide list of available actions
-    def actions(self):
-        self.bot_speak('My main available services include: basic conversation, search on google, youtube'
-                       ' and google maps, data base management, operating system basic management, launching'
-                       ' funny guessing game and, of course, making your life more interesting!')
+    async def actions(self):
+        await self.bot_speak('My main available services include: basic conversation, search on google, youtube'
+                             ' and google maps, data base management, operating system basic management, launching'
+                             ' funny guessing game and, of course, making your life more interesting!')
 
     # invalid command provided
-    def say_default(self):
-        self.bot_speak('Unfortunately, there is no such command. Try something else!')
+    async def say_default(self):
+        # await self.bot_speak('Unfortunately, there is no such command. Try something else!')
+        await self.bot_speak('Yes master? I am not sure what you mean...')
 
     # command for voice testing
-    def test_voice(self):
-        self.bot_speak('I hear you properly')
+    async def test_voice(self):
+        await self.bot_speak('I hear you properly')
 
     # command for testing connection
-    def yes_sir(self):
-        self.bot_speak('Did you call me master?')
+    async def yes_sir(self):
+        await self.bot_speak('Did you call me master?')
 
     # search on wikipedia
-    def from_wiki(self, query):
-        self.bot_speak('Checking the wikipedia... Please wait...')
+    async def from_wiki(self, query):
+        await self.bot_speak('Checking the wikipedia... Please wait...')
         time.sleep(0.5)
 
         try:
             query = query.replace('get information about', '')
             result = wikipedia.summary(query, sentences=4)
-            self.bot_speak('According to wikipedia ' + result)
+            await self.bot_speak('According to wikipedia ' + result)
         except wikipedia.exceptions.PageError:
-            self.bot_speak('Invalid topic')
+            await self.bot_speak('Invalid topic')
             exit()
         except wikipedia.exceptions.DisambiguationError:
-            self.bot_speak('Critical level of ambiguity reached')
+            await self.bot_speak('Critical level of ambiguity reached')
             exit()
 
     # randomizer mood
-    def mood(self):
+    async def mood(self):
         moods = ['funny', 'faithful', 'awesome', 'crazy', 'new age', 'outer enemy']
         status = dict()
         status['funny'] = 'I\'m pretty fine Sami. You know ... life is gonna be more interesting when you have a ' \
@@ -823,23 +850,23 @@ class TalkingBot(object):
                                 'arrive. Feel no fear, soldier!'
 
         bot_mood = random.choice(moods)
-        self.bot_speak(status[bot_mood])
+        await self.bot_speak(status[bot_mood])
 
     # I am fine
-    def fine(self):
-        self.bot_speak('I\'m fine, Sami! How are you?')
+    async def fine(self):
+        await self.bot_speak('I\'m fine, Sami! How are you?')
 
     # I am satisfied
-    def wonderful(self):
-        self.bot_speak('It\'s good to know that you are awesome!')
+    async def wonderful(self):
+        await self.bot_speak('It\'s good to know that you are awesome!')
 
     # say joke
-    def say_joke(self):
-        self.bot_speak(pyjokes.get_joke())
+    async def say_joke(self):
+        await self.bot_speak(pyjokes.get_joke())
 
     # send email
     @staticmethod
-    def send_email_protocol(to, content):
+    async def send_email_protocol(to, content):
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.ehlo()
         server.starttls()
@@ -850,39 +877,43 @@ class TalkingBot(object):
         server.close()
 
     # main method send email
-    def send_email(self):
+    async def send_email(self):
+        self.is_engaged = True
         try:
-            self.bot_speak("What should I say?")
+            await self.bot_speak("What should I say?")
             while True:
-                content = self.record_audio()
+                content = await self.record_audio()
                 if self.speech_unrecognizable is False:
                     break
 
-            self.bot_speak("Whom should I send this email?")
+            await self.bot_speak("Whom should I send this email?")
             to = input()
-            self.send_email_protocol(to, content)
-            self.bot_speak("Email has been sent!")
+            await self.send_email_protocol(to, content)
+            await self.bot_speak("Email has been sent!")
         except smtplib.SMTPException:
-            self.bot_speak("I am not able to send this email")
+            await self.bot_speak("I am not able to send this email")
+        self.is_engaged = False
 
     # change name
-    def change_name(self):
-        self.bot_speak('What name do you want to provide me, sir?')
+    async def change_name(self):
+        self.is_engaged = True
+        await self.bot_speak('What name do you want to provide me, sir?')
         while True:
-            name = self.record_audio()
+            name = await self.record_audio()
             if self.speech_unrecognizable is False:
                 break
         self.name = name
-        self.bot_speak('Thanks for taking care of me, sir!')
+        await self.bot_speak('Thanks for taking care of me, sir!')
+        self.is_engaged = False
 
     # take photo
-    def take_photo(self):
+    async def take_photo(self):
         ec.capture(0, "Alexis Camera", "img.jpg")
-        self.bot_speak('Photo has been taken')
+        await self.bot_speak('Photo has been taken')
 
     # get current wish
     @staticmethod
-    def get_wish():
+    async def get_wish():
         hour = int(datetime.datetime.now().hour)
         if 0 <= hour < 12:
             wish = "Good morning"
@@ -894,36 +925,39 @@ class TalkingBot(object):
         return wish
 
     # hibernate method
-    def hibernate(self):
-        self.bot_speak('How many seconds do you want me to hibernate?')
+    async def hibernate(self):
+        self.is_engaged = True
+        await self.bot_speak('How many seconds do you want me to hibernate?')
         while True:
-            sec = self.record_audio()
+            sec = await self.record_audio()
             if self.speech_unrecognizable is False and sec.isnumeric() is True:
                 break
 
-        self.bot_speak('I will deactivate myself for ' + sec + ' seconds. Please wait in silence...')
+        await self.bot_speak('I will deactivate myself for ' + sec + ' seconds. Please wait in silence...')
         time.sleep(int(sec))
-        self.bot_speak(self.get_wish() + ' Sami! I am back and ready to answer your call!')
+        await self.bot_speak(await self.get_wish() + ' Sami! I am back and ready to answer your call!')
+        self.is_engaged = False
 
     # find news
-    def get_news(self):
+    async def get_news(self):
+        self.is_engaged = True
         try:
             json_obj = urlopen(
                 'https://newsapi.org/v2/top-headlines?country=us&apiKey=c28a8672d2ab4958bce7b891b4324674')
             data = json.load(json_obj)
             i = 1
 
-            self.bot_speak('Here are your news')
+            await self.bot_speak('Here are your news')
             for item in data['articles']:
-                self.bot_speak(str(i) + '. ' + item['title'])
+                await self.bot_speak(str(i) + '. ' + item['title'])
                 if item['description'] is not None:
                     print(item['description'] + '\n')
                 else:
                     print('Nothing to show\n')
 
-                self.bot_speak('Should I continue?')
+                await self.bot_speak('Should I continue?')
                 while True:
-                    cont = self.record_audio()
+                    cont = await self.record_audio()
                     if self.speech_unrecognizable is False:
                         break
 
@@ -931,20 +965,22 @@ class TalkingBot(object):
                     break
                 i += 1
 
-            self.bot_speak('News podcast finished')
+            await self.bot_speak('News podcast finished')
         except Exception as e:
-            self.bot_speak(str(e))
+            await self.bot_speak(str(e))
+        self.is_engaged = False
 
     # show weather status
-    def get_weather(self):
+    async def get_weather(self):
+        self.is_engaged = True
         # Google Open weather website
         # to get API of Open weather
         api_key = "c693e3c0e3cdf859bbd916c012dc4ba2"
         base_url = "http://api.openweathermap.org/data/2.5/weather?"
-        self.bot_speak("Provide a valid city name")
+        await self.bot_speak("Provide a valid city name")
 
         while True:
-            city_name = self.record_audio()
+            city_name = await self.record_audio()
             if self.speech_unrecognizable is False:
                 break
 
@@ -963,42 +999,44 @@ class TalkingBot(object):
             current_humidity = y["humidity"]
             z = x["weather"]
             weather_description = z[0]["description"]
-            self.bot_speak("Weather in " + city_name + " Temperature (in celsius unit), " +
-                           str(current_temperature - 273) + "\n atmospheric pressure (in hPa unit), " +
-                           str(current_pressure) + "\n humidity (in percentage), " +
-                           str(current_humidity) + "\n description, " +
-                           str(weather_description))
+            await self.bot_speak("Weather in " + city_name + " Temperature (in celsius unit), " +
+                                 str(current_temperature - 273) + "\n atmospheric pressure (in hPa unit), " +
+                                 str(current_pressure) + "\n humidity (in percentage), " +
+                                 str(current_humidity) + "\n description, " +
+                                 str(weather_description))
 
         except urllib.error.HTTPError:
-            self.bot_speak("City Not Found")
+            await self.bot_speak("City Not Found")
+        self.is_engaged = False
 
     # translate method
-    def specific_translation(self):
-        self.bot_speak('Please provide source language')
+    async def specific_translation(self):
+        self.is_engaged = True
+        await self.bot_speak('Please provide source language')
         while True:
-            lang1 = self.record_audio()
+            lang1 = await self.record_audio()
             lang1 = lang1.lower()
             if self.speech_unrecognizable is False:
                 break
-        self.bot_speak('Now, provide the text to be translated! Do you want to speak or write?')
+        await self.bot_speak('Now, provide the text to be translated! Do you want to speak or write?')
         while True:
-            choice = self.record_audio()
+            choice = await self.record_audio()
             if self.speech_unrecognizable is False:
                 break
 
         if 'write' in choice:
-            self.bot_speak('Please write: ')
+            await self.bot_speak('Please write: ')
             text = str(input())
         else:
-            self.bot_speak('Please speak: ')
+            await self.bot_speak('Please speak: ')
             while True:
-                text = self.record_audio()
+                text = await self.record_audio()
                 if self.speech_unrecognizable is False or 'stop' in text:
                     break
 
-        self.bot_speak('Lastly, provide destination language')
+        await self.bot_speak('Lastly, provide destination language')
         while True:
-            lang2 = self.record_audio()
+            lang2 = await self.record_audio()
             lang2 = lang2.lower()
             if self.speech_unrecognizable is False:
                 break
@@ -1017,43 +1055,45 @@ class TalkingBot(object):
                 break
 
         if oks is True and okd is True:
-            self.bot_speak('Initialize translation engine... Please wait...')
+            await self.bot_speak('Initialize translation engine... Please wait...')
             time.sleep(0.5)
 
             translator = Translator(from_lang=lang1, to_lang=lang2)
             translation = translator.translate(text)
 
-            self.bot_speak('Text before translation is: ')
+            await self.bot_speak('Text before translation is: ')
             time.sleep(0.1)
             self.bot_speak_language(text, self.lang_dict[lang1])
 
-            self.bot_speak('Text after translation is: ')
+            await self.bot_speak('Text after translation is: ')
             time.sleep(0.1)
             self.bot_speak_language(translation, self.lang_dict[lang2])
 
         else:
-            self.bot_speak('Wrong language id provided')
+            await self.bot_speak('Wrong language id provided')
 
         time.sleep(0.5)
-        self.bot_speak('Translation session finished')
+        await self.bot_speak('Translation session finished')
+        self.is_engaged = False
 
     # open browser
-    def open_browser(self):
+    async def open_browser(self):
         webbrowser.get().open('https://google.com')
-        self.bot_speak('The browser has been launched')
+        await self.bot_speak('The browser has been launched')
 
     # write note
-    def write_note(self):
-        self.bot_speak("What should I write Sami?")
+    async def write_note(self):
+        self.is_engaged = True
+        await self.bot_speak("What should I write Sami?")
         while True:
-            note = self.record_audio()
+            note = await self.record_audio()
             if self.speech_unrecognizable is False:
                 break
 
         file = open('Alexis.txt', 'a+')
-        self.bot_speak("Should I include date and time for current note?")
+        await self.bot_speak("Should I include date and time for current note?")
         while True:
-            choice = self.record_audio()
+            choice = await self.record_audio()
             if self.speech_unrecognizable is False:
                 break
 
@@ -1065,55 +1105,58 @@ class TalkingBot(object):
         else:
             file.write(note)
 
-        self.bot_speak('Note inserted successfully')
+        await self.bot_speak('Note inserted successfully')
+        self.is_engaged = False
 
     # get note
-    def get_note(self):
-        self.bot_speak("Showing Notes")
+    async def get_note(self):
+        await self.bot_speak("Showing Notes")
         time.sleep(0.1)
         file = open("Alexis.txt", "r")
         text = file.read()
-        self.bot_speak(text)
+        await self.bot_speak(text)
 
     # change background
-    def background(self):
+    async def background(self):
+        self.is_engaged = True
         path = ['C:\\Users\\barbu\\PycharmProjects\\AlexisAPI_final\\images\\mars.jpg',
                 'C:\\Users\\barbu\\PycharmProjects\\AlexisAPI_final\\images\\ocean.jpg',
                 'C:\\Users\\barbu\\PycharmProjects\\AlexisAPI_final\\images\\optimus.jpg',
                 'C:\\Users\\barbu\\PycharmProjects\\AlexisAPI_final\\images\\sky.jpg']
-        self.bot_speak('You have 4 available wallpapers. Choose your favourite ID: 0, 1, 2 or 3?')
+        await self.bot_speak('You have 4 available wallpapers. Choose your favourite ID: 0, 1, 2 or 3?')
         while True:
-            index = self.record_audio()
+            index = await self.record_audio()
             if self.speech_unrecognizable is False and index.isnumeric() is True and int(index) < len(path):
                 break
 
         ctypes.windll.user32.SystemParametersInfoW(20, 0, path[int(index)], 0)
-        self.bot_speak("Background changed successfully")
+        await self.bot_speak("Background changed successfully")
+        self.is_engaged = False
 
     # clear logging file content
-    def clear_log(self):
+    async def clear_log(self):
         open('Logging.txt', 'w').close()
-        self.bot_speak('Logging file content has been cleared')
+        await self.bot_speak('Logging file content has been cleared')
 
     # thanks
-    def thanks(self):
-        self.bot_speak('You\'re welcome Sami!')
+    async def thanks(self):
+        await self.bot_speak('You\'re welcome Sami!')
 
     # track location by ip
-    def track_ip(self):
+    async def track_ip(self):
         gip = pygeoip.GeoIP('GeoLiteCity.dat')
-        self.bot_speak('Please provide a suitable IP address to be tracked')
+        await self.bot_speak('Please provide a suitable IP address to be tracked')
         my_ip = input()
 
         time.sleep(0.1)
-        self.bot_speak('IP tracker engine is being initialized... Please wait...')
+        await self.bot_speak('IP tracker engine is being initialized... Please wait...')
         time.sleep(0.4)
         res = gip.record_by_addr(my_ip)
-        self.bot_speak('Here is your desired location: ')
+        await self.bot_speak('Here is your desired location: ')
         try:
             for key, val in res.items():
                 print('%s: %s' % (key, val))
-            # self.bot_speak('Latitude: %s \nLongitude: %s' % (res['latitude'], res['longitude']))
+            # await self.bot_speak('Latitude: %s \nLongitude: %s' % (res['latitude'], res['longitude']))
 
             m = folium.Map(
                 location=[float(res['latitude']), float(res['longitude'])],
@@ -1131,16 +1174,16 @@ class TalkingBot(object):
             path = 'http://localhost:63342/Alexis/IP_map.html'
             webbrowser.get().open(path)
         except AttributeError:
-            self.bot_speak('There is no such ip address...')
+            await self.bot_speak('There is no such ip address...')
 
     # create project as docx
-    def make_essay(self):
+    async def make_essay(self):
         global wikipage
         wikipedia.set_lang('ro')
 
-        self.bot_speak('Provide the subject of the essay')
+        await self.bot_speak('Provide the subject of the essay')
         title = input('Essay\'s topic: ')
-        self.bot_speak('Now, provide the name of the author')
+        await self.bot_speak('Now, provide the name of the author')
         name = input('Author\'s name: ')
 
         try:
@@ -1162,67 +1205,71 @@ class TalkingBot(object):
         paragraph = document.add_paragraph("    " + text)
         document.save(title + '.docx')
 
-        self.bot_speak('Your essay is ready my friend!')
+        await self.bot_speak('Your essay is ready my friend!')
 
     # pbinfo bot invoke
-    def pbinfo_invoke(self):
+    async def pbinfo_invoke(self):
+        self.is_engaged = True
         config = getAppConfig("./settings.json")
         AppPbinfo = App(config)
 
-        self.bot_speak('Let me know what action you want to perform on pbinfo...')
+        await self.bot_speak('Let me know what action you want to perform on pbinfo...')
         time.sleep(0.3)
 
         while True:
             while True:
-                message = self.record_audio()
+                message = await self.record_audio()
                 if self.speech_unrecognizable is False:
                     break
 
             if 'exit' in message:
                 break
             elif 'pick user' in message:
-                self.bot_speak(
+                await self.bot_speak(
                     'I\'m gonna populate my data base with users from pbinfo ... Please wait ...')
                 AppPbinfo.run_for_users()
             elif 'save code' in message:
-                self.bot_speak('I\'m gonna populate my data base with your submissions ... Please wait ...')
+                await self.bot_speak('I\'m gonna populate my data base with your submissions ... Please wait ...')
                 AppPbinfo.run_for_code_download()
             elif 'deploy code' in message:
-                self.bot_speak(
+                await self.bot_speak(
                     'I\'m gonna upload your submmissions from my data base to pbinfo account ... '
                     'Please wait ...')
                 AppPbinfo.run_for_code_upload()
             elif 'delete user' in message:
-                self.bot_speak('I\'m gonna delete all users from data base ...')
+                await self.bot_speak('I\'m gonna delete all users from data base ...')
                 AppPbinfo.clearDBUsers()
             elif 'delete submission' in message:
-                self.bot_speak('I\'m gonna delete all submissions from data base ...')
+                await self.bot_speak('I\'m gonna delete all submissions from data base ...')
                 AppPbinfo.clearDBSubmissions()
             else:
-                self.bot_speak('Try another command, please!')
+                await self.bot_speak('Try another command, please!')
 
             time.sleep(0.3)
 
         time.sleep(0.3)
-        self.bot_speak('Pbinfo bot has been launched successfully!')
+        await self.bot_speak('Pbinfo bot has been launched successfully!')
+        self.is_engaged = False
 
     # neural network based conversation engine
-    def start_conversation(self):
-        self.bot_speak('What model do you want to use?')
+    async def start_conversation(self):
+        self.is_engaged = True
+        await self.bot_speak('What model do you want to use?')
         while True:
-            option = self.record_audio()
+            option = await self.record_audio()
             if self.speech_unrecognizable is False:
                 break
 
         if 'mine' in option:
-            self.bot_speak('I\'m gonna enter into the smart conversation mode in a few seconds ... Please wait ...')
+            await self.bot_speak(
+                'I\'m gonna enter into the smart conversation mode in a few seconds ... Please wait ...')
             self.brain.updateNeuralNetwork()
             time.sleep(0.3)
 
-            self.bot_speak('You can talk to me now!')
+            await self.bot_speak('You can talk to me now!')
             while True:
                 while True:
-                    message = self.record_audio()
+                    message = await self.record_audio()
                     if self.speech_unrecognizable is False:
                         break
 
@@ -1231,15 +1278,22 @@ class TalkingBot(object):
 
                 intent = self.conversation_engine.predict_class(message)
                 response = self.conversation_engine.get_response(intent)
-                self.bot_speak(response)
+                await self.bot_speak(response)
         else:
-            self.bot_speak('I\'m gonna use a pretrained model based on reddit comments. Be careful! I cannot control '
-                           'myself in this state ...')
+            await self.bot_speak(
+                'I\'m gonna use a pretrained model based on reddit comments. Be careful! I cannot control '
+                'myself in this state ...')
             time.sleep(0.3)
             main(AudioEngine(self.engine))
 
         time.sleep(0.3)
-        self.bot_speak('Thanks for your collaboration ... I have learned a lot from this conversation with you!')
+        await self.bot_speak('Thanks for your collaboration ... I have learned a lot from this conversation with you!')
+        self.is_engaged = False
+
+    async def bot_speak_to_discord(self, command):
+        if self.record is True:
+            self.logs.write('\nAlexis: ' + command)
+        await self.channel.send(command)
 
     # convert message content to response to use in real conversation
     def convert_message_to_response(self, message):
@@ -1248,176 +1302,180 @@ class TalkingBot(object):
         return response
 
     # conversation main method
-    def respond(self, voice_data_local):
+    async def respond(self, voice_data_local):
+        if self.sex == 'discord':
+            self.channel = voice_data_local.channel
+            voice_data_local = voice_data_local.content.lower()
+
         if 'who are you' in voice_data_local:
-            self.say_my_name()
+            await self.say_my_name()
 
         elif 'feel' in voice_data_local:
-            self.mood()
+            await self.mood()
 
         elif 'clear' in voice_data_local:
-            self.clear_log()
+            await self.clear_log()
 
         elif 'open browser' in voice_data_local:
-            self.open_browser()
+            await self.open_browser()
 
         elif 'awesome' in voice_data_local:
-            self.wonderful()
+            await self.wonderful()
 
         elif 'programming' in voice_data_local:
-            self.pbinfo_invoke()
+            await self.pbinfo_invoke()
 
         elif 'background' in voice_data_local:
-            self.background()
+            await self.background()
 
         elif 'thank you' in voice_data_local or 'thanks' in voice_data_local:
-            self.thanks()
+            await self.thanks()
 
         elif 'write a note' in voice_data_local:
-            self.write_note()
+            await self.write_note()
 
         elif 'show note' in voice_data_local:
-            self.get_note()
+            await self.get_note()
 
         elif 'news' in voice_data_local:
-            self.get_news()
+            await self.get_news()
 
         elif 'translate' in voice_data_local:
-            self.specific_translation()
+            await self.specific_translation()
 
         elif 'sleep' in voice_data_local or 'hibernate' in voice_data_local or 'deactivate' in voice_data_local:
-            self.hibernate()
+            await self.hibernate()
 
         elif 'send email' in voice_data_local:
-            self.send_email()
+            await self.send_email()
 
         elif 'ip' in voice_data_local:
-            self.track_ip()
+            await self.track_ip()
 
         elif 'name' in voice_data_local:
-            self.change_name()
+            await self.change_name()
 
         elif 'weather' in voice_data_local:
-            self.get_weather()
+            await self.get_weather()
 
         elif 'camera' in voice_data_local or 'take photo' in voice_data_local:
-            self.take_photo()
+            await self.take_photo()
 
         elif 'how are you' in voice_data_local:
-            self.fine()
+            await self.fine()
 
         elif 'joke' in voice_data_local:
-            self.say_joke()
+            await self.say_joke()
 
         elif self.name.lower() in voice_data_local:
-            self.yes_sir()
+            await self.yes_sir()
 
         elif 'describe yourself' in voice_data_local:
-            self.describe()
+            await self.describe()
 
         elif 'what can you' in voice_data_local:
-            self.actions()
+            await self.actions()
 
         elif 'question' in voice_data_local:
-            self.answer_question()
+            await self.answer_question()
 
         elif 'what time is it' in voice_data_local:
-            self.get_current_time()
+            await self.get_current_time()
 
         elif 'hear' in voice_data_local:
-            self.test_voice()
+            await self.test_voice()
 
         elif 'search' in voice_data_local:
-            self.search_for()
+            await self.search_for()
 
         elif 'info' in voice_data_local:
-            self.from_wiki(voice_data_local)
+            await self.from_wiki(voice_data_local)
 
         elif 'find location' in voice_data_local:
-            self.find_location()
+            await self.find_location()
 
         elif 'play' in voice_data_local:
-            self.play_music()
+            await self.play_music()
 
         elif 'project' in voice_data_local:
-            self.access_project()
+            await self.access_project()
 
         elif 'exit' in voice_data_local:
-            self.exit()
+            await self.exit()
 
         elif 'shutdown' in voice_data_local or 'turn off' in voice_data_local:
-            self.shutdown()
+            await self.shutdown()
 
         elif 'restart' in voice_data_local:
-            self.restart()
+            await self.restart()
 
         elif 'game' in voice_data_local:
-            self.start_game()
+            await self.start_game()
 
         elif 'repeat' in voice_data_local:
-            self.repeat_after_me()
+            await self.repeat_after_me()
 
         elif 'query' in voice_data_local:
-            self.launch_sql()
+            await self.launch_sql()
 
         elif 'voice' in voice_data_local:
-            self.change_voice()
+            await self.change_voice()
 
         elif 'essay' in voice_data_local:
-            self.make_essay()
+            await self.make_essay()
 
         elif 'conversation' in voice_data_local:
-            self.start_conversation()
+            await self.start_conversation()
 
         else:
-            self.say_default()
+            await self.say_default()
 
     # wait for being called and start conversation
-    def run(self):
+    async def run(self):
         toast = ToastNotifier()
         toast.show_toast("Alexis API", "Alexis Voice Assistant is waiting for your call!", duration=3)
 
         greetings = False
         while greetings is False:
-            voice_data = self.record_audio()
+            voice_data = await self.record_audio()
             if self.name.lower() in voice_data:
                 greetings = True
 
-        self.bot_speak('I\'m here at your disposal but, first of all, let me know your name in order to perform '
-                       'authentication!')
+        await self.bot_speak('I\'m here at your disposal but, first of all, let me know your name in order to perform '
+                             'authentication!')
 
         while True:
-            voice_data = self.record_audio()
+            voice_data = await self.record_audio()
             if self.speech_unrecognizable is False:
                 break
         my_name = voice_data
         if 'sam' in my_name or 'sammy' in my_name or 'sami' in my_name:
-            self.bot_speak(self.get_wish() + ' master! Now, relax and enjoy the show!')
+            await self.bot_speak(await self.get_wish() + ' master! Now, relax and enjoy the show!')
         else:
-            self.bot_speak('Sorry stranger! You are not in the position to tell me what to do! '
-                           'Have a nice day!')
+            await self.bot_speak('Sorry stranger! You are not in the position to tell me what to do! '
+                                 'Have a nice day!')
             exit()
 
         time.sleep(0.3)
-        self.bot_speak('Before we begin, do you want to record the current conversation?')
+        await self.bot_speak('Before we begin, do you want to record the current conversation?')
         while True:
-            voice_data = self.record_audio()
+            voice_data = await self.record_audio()
             if self.speech_unrecognizable is False:
                 break
         if 'yup' in voice_data or 'yes' in voice_data or 'of course' in voice_data or 'sure' in voice_data:
             self.record = True
 
         time.sleep(0.3)
-        self.bot_speak('How can I help you, Sami?')
+        await self.bot_speak('How can I help you, Sami?')
 
         while True:
-            voice_data = self.record_audio()
-            self.respond(voice_data)
+            voice_data = await self.record_audio()
+            await self.respond(voice_data)
 
 
 client = discord.Client()
 load_dotenv(".env")
-MyBot = TalkingBot('Alexis', 'm')
+MyBot = TalkingBot('Alexis', 'discord')
 
 
 def run_discord():
@@ -1434,9 +1492,11 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if 'alexis' in message.content or 'Alexis' in message.content:
-        response = MyBot.convert_message_to_response(message)
-        await message.channel.send(response)
+    if MyBot.name.lower() in message.content.lower():
+        # response = MyBot.convert_message_to_response(message)
+        # await message.channel.send(response)
+        if not MyBot.is_engaged:
+            await MyBot.respond(message)
 
 
 # driver code
